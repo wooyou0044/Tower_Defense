@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 413554}
   - component: {fileID: 859762303666839861}
   - component: {fileID: 8319911073854327495}
+  - component: {fileID: 7038950822063883753}
   m_Layer: 0
   m_Name: Cactus3
-  m_TagString: Untagged
+  m_TagString: Deco
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -85,6 +86,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7038950822063883753
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114448}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5626833, y: 1.1720929, z: 1.5525105}
+  m_Center: {x: 0, y: 0.58834016, z: 0.0000002682209}
 --- !u!1 &197264
 GameObject:
   m_ObjectHideFlags: 0

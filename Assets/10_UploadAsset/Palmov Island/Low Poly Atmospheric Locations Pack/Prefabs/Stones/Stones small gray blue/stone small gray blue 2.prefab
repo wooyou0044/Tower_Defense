@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 7274056850898503892}
   - component: {fileID: 6007097939917424497}
   - component: {fileID: 8410904370271663035}
+  - component: {fileID: -4862708257577330834}
   m_Layer: 0
   m_Name: stone small gray blue 2
-  m_TagString: Untagged
+  m_TagString: Deco
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,3 +84,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &-4862708257577330834
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8050593927968658030}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.56137246, y: 0.5652502, z: 0.5650292}
+  m_Center: {x: 0.0030860305, y: 0.27203134, z: -0.006078452}

@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 4680129505705161104}
   - component: {fileID: 8601017018326351413}
   - component: {fileID: 5816403461188520703}
+  - component: {fileID: 6312936295246444784}
   m_Layer: 0
   m_Name: CrossPlains_Rock_05
-  m_TagString: Untagged
+  m_TagString: Deco
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,3 +84,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6312936295246444784
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5456383978167675690}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9310246, y: 1.4461797, z: 1.9706464}
+  m_Center: {x: 0.074379295, y: 0.7529473, z: 0.066113085}
