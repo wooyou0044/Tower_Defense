@@ -2530,7 +2530,7 @@ MonoBehaviour:
   zoomSpeed: 10
   minZoomZ: 10
   maxZoomZ: 50
-  moveSpeed: 10
+  moveSpeed: 30
   edgeSize: 30
   moveDistance: 5
   rotateSpeed: 10
