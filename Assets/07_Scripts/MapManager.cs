@@ -8,8 +8,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] GameObject[] decoObjects;
     [SerializeField] Terrain mapTerrain;
     [SerializeField] int count;
-    [SerializeField] float margin;
-
+    public float margin;
 
     void Start()
     {
@@ -23,7 +22,7 @@ public class MapManager : MonoBehaviour
 
             float y = mapTerrain.SampleHeight(new Vector3(x, 0, z));
 
-            Vector3 position = new Vector3(x, y, z) + mapTerrain.transform.position;
+            Vector3 position = new Vector3(x, y ,z) + mapTerrain.transform.position;
 
             int random = Random.Range(0, decoObjects.Length);
             Instantiate(decoObjects[random], decoObjects[random].transform.position + position, Quaternion.identity, transform);

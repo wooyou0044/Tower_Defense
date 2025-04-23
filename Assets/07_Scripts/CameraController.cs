@@ -13,12 +13,13 @@ public class CameraController : MonoBehaviour
     [SerializeField] float edgeSize;
     [SerializeField] float moveDistance;
     [SerializeField] float rotateSpeed;
+    [SerializeField] MapManager mapManager;
 
     Camera cam;
 
-    float originZoomSpeed;
-    bool isMoving;
-    Vector3 targetPos;
+    float camSize;
+
+    Terrain terrain;
 
     private void Awake()
     {
@@ -27,7 +28,7 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        originZoomSpeed = zoomSpeed;
+        terrain = Terrain.activeTerrain;
     }
 
     void Update()
@@ -55,9 +56,7 @@ public class CameraController : MonoBehaviour
         }
 
         Vector3 move = (new Vector3(h, v, 0) + moveDir) * moveSpeed * Time.deltaTime;
-
         transform.Translate(move, Space.World);
-
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if(scroll != 0)
@@ -65,6 +64,8 @@ public class CameraController : MonoBehaviour
             cam.orthographicSize -= scroll * zoomSpeed;
             cam.orthographicSize = Mathf.Clamp(cam.orthographicSize, minZoomZ, maxZoomZ);
         }
+
+        camSize = cam.orthographicSize;
 
         if(Input.GetKey(KeyCode.Q))
         {
@@ -75,6 +76,11 @@ public class CameraController : MonoBehaviour
         {
             transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime, Space.World);
         }
+
     }
 
+    void LateUpdate()
+    {
+        
+    }
 }
