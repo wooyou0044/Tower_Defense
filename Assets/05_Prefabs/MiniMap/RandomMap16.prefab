@@ -1013,6 +1013,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1488563242746515070}
+  - component: {fileID: -4270376851356244156}
   m_Layer: 0
   m_Name: RandomMap16
   m_TagString: Untagged
@@ -1049,6 +1050,18 @@ Transform:
   - {fileID: 878603524537602813}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4270376851356244156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4904219427808371943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a94954c86abfc408f918852231e478, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5107738504496003496
 GameObject:
   m_ObjectHideFlags: 0

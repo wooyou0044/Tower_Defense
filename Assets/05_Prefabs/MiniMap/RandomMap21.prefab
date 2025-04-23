@@ -575,6 +575,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4968725719525163930}
+  - component: {fileID: 1092173179090386034}
   m_Layer: 0
   m_Name: RandomMap21
   m_TagString: Untagged
@@ -607,6 +608,18 @@ Transform:
   - {fileID: 3736445339667822523}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1092173179090386034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4125756535550645324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a94954c86abfc408f918852231e478, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4505572010526113944
 GameObject:
   m_ObjectHideFlags: 0
