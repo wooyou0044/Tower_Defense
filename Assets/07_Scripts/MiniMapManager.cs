@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MiniMapManager : MonoBehaviour
@@ -24,7 +25,7 @@ public class MiniMapManager : MonoBehaviour
         foreach (Transform child in transform)
         {
             TileNode node = child.GetComponent<TileNode>();
-            if (node == null || node.type == TileType.Road)
+            if (node == null)
             {
                 Debug.Log(node.gameObject);
                 continue;
@@ -59,16 +60,42 @@ public class MiniMapManager : MonoBehaviour
             //{
             //    baseX = Mathf.RoundToInt(pos.x / 4);
             //}
-            if (width == indexSize)
-            {
-                baseZ = Mathf.FloorToInt(-pos.z / 4);
-                Debug.Log(baseZ);
-                for (int i = 0; i < width; i++)
-                {
-                    tileNodes[baseZ, i].type = node.type;
-                }
-                continue;
-            }
+
+            //=============================================================
+            //if (width == indexSize)
+            //{
+            //    baseZ = Mathf.FloorToInt(-pos.z / 4);
+            //    //for (int i = 0; i < width; i++)
+            //    //{
+            //    //    tileNodes[baseZ, i].type = node.type;
+            //    //}
+            //    for(int i=0; i<height; i++)
+            //    {
+            //        for (int j = 0; j < width; j++)
+            //        {
+            //            int z = baseZ + i;
+            //            tileNodes[baseZ, i].type = node.type;
+            //        }
+            //    }
+            //    continue;
+            //}
+
+            //if(height == indexSize)
+            //{
+            //    baseX = Mathf.FloorToInt(pos.x / 4);
+            //    for(int i=0; i<height; i++)
+            //    {
+            //        for(int j=0; j<width; j++)
+            //        {
+            //            int x = baseX + j;
+            //            tileNodes[i, x].type = node.type;
+            //        }
+            //    }
+            //    continue;
+            //}
+            //=============================================================
+
+
 
             //if (width > height && (pos.x / 4 * 10) % 10 >= 5f)
             //{
@@ -101,7 +128,7 @@ public class MiniMapManager : MonoBehaviour
             ////int baseX = Mathf.FloorToInt(pos.x / 4);
             ////baseZ = Mathf.FloorToInt(-pos.z / 4);
 
-            //if(width >= 3 && isAbandon == false)
+            //if (width >= 3 && isAbandon == false)
             //{
             //    baseX -= 1;
             //}
@@ -114,7 +141,7 @@ public class MiniMapManager : MonoBehaviour
             //baseX = Mathf.FloorToInt(pos.x) / 4;
             //baseZ = Mathf.FloorToInt(-pos.z) / 4;
 
-            if(pos.x % 4 == 0)
+            if (pos.x % 4 == 0)
             {
                 baseX = Mathf.FloorToInt(pos.x / 4);
             }
@@ -207,6 +234,17 @@ public class MiniMapManager : MonoBehaviour
                         baseZ = gridPosZ / 4;
                     }
                 }
+            }
+
+            if (width >= 3 && isAbandon == false)
+            {
+                //baseX -= 1;
+                baseX -= Mathf.FloorToInt(width / node.gridSize);
+            }
+            if (height >= 3)
+            {
+                //baseZ -= 1;
+                baseZ -= Mathf.FloorToInt(height / node.gridSize);
             }
 
             for (int i = 0; i < height; i++)
