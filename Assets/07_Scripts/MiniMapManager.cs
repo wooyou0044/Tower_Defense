@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class MiniMapManager : MonoBehaviour
 {
-    public TileNode[,] tileNodes;
+    TileNode[,] tileNodes;
+    bool[] isRoadSide;
 
     int indexSize;
 
@@ -13,10 +14,11 @@ public class MiniMapManager : MonoBehaviour
     {
         indexSize = 5;
         tileNodes = new TileNode[indexSize, indexSize];
+        isRoadSide = new bool[4];
 
-        for(int i=0; i<tileNodes.GetLength(0); i++)
+        for (int i = 0; i < tileNodes.GetLength(0); i++)
         {
-            for(int j=0; j<tileNodes.GetLength(1); j++)
+            for (int j = 0; j < tileNodes.GetLength(1); j++)
             {
                 tileNodes[i, j] = new TileNode();
             }
@@ -33,9 +35,6 @@ public class MiniMapManager : MonoBehaviour
             Vector3 pos = child.localPosition;
             Vector3 scale = child.localScale;
 
-            bool isAbandon = false;
-
-            Debug.Log("node.gridSize : " + node.gridSize);
             int width = Mathf.FloorToInt(scale.x / node.gridSize);
             int height = Mathf.FloorToInt(scale.z / node.gridSize);
 
@@ -43,103 +42,41 @@ public class MiniMapManager : MonoBehaviour
             int gridPosZ = 0;
             int baseX;
             int baseZ;
-            //if ((pos.x / 4 * 10) % 10 > 5f)
-            //{
-            //    baseX = Mathf.RoundToInt(pos.x / 4);
-            //}
-            //else
-            //{
-            //    baseX = Mathf.FloorToInt(pos.x / 4);
-            //}
 
-            //if ((pos.x / 4) < 1 && (pos.x % 4) > 0.5f)
-            //{
-            //    baseX = Mathf.FloorToInt(pos.x / 4);
-            //}
-            //else
-            //{
-            //    baseX = Mathf.RoundToInt(pos.x / 4);
-            //}
+            if (width == indexSize)
+            {
+                baseZ = Mathf.FloorToInt(-pos.z / 4);
+                if (height >= 3)
+                {
+                    //baseZ -= 1;
+                    baseZ -= Mathf.RoundToInt((float)height / 4);
+                }
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        int z = baseZ + i;
+                        tileNodes[z, j].type = node.type;
+                        //tileNodes[z, j] = new TileNode(node.type);
+                    }
+                }
+                continue;
+            }
 
-            //=============================================================
-            //if (width == indexSize)
-            //{
-            //    baseZ = Mathf.FloorToInt(-pos.z / 4);
-            //    //for (int i = 0; i < width; i++)
-            //    //{
-            //    //    tileNodes[baseZ, i].type = node.type;
-            //    //}
-            //    for(int i=0; i<height; i++)
-            //    {
-            //        for (int j = 0; j < width; j++)
-            //        {
-            //            int z = baseZ + i;
-            //            tileNodes[baseZ, i].type = node.type;
-            //        }
-            //    }
-            //    continue;
-            //}
-
-            //if(height == indexSize)
-            //{
-            //    baseX = Mathf.FloorToInt(pos.x / 4);
-            //    for(int i=0; i<height; i++)
-            //    {
-            //        for(int j=0; j<width; j++)
-            //        {
-            //            int x = baseX + j;
-            //            tileNodes[i, x].type = node.type;
-            //        }
-            //    }
-            //    continue;
-            //}
-            //=============================================================
-
-
-
-            //if (width > height && (pos.x / 4 * 10) % 10 >= 5f)
-            //{
-            //    baseX = Mathf.FloorToInt(pos.x / 4);
-            //    isAbandon = true;
-            //}
-            //else if(width == height && (pos.x / 4 * 10) % 10 == 5f)
-            //{
-            //    baseX = Mathf.FloorToInt(pos.x / 4);
-            //}
-            //else
-            //{
-            //    baseX = Mathf.RoundToInt(pos.x / 4);
-            //}
-
-            //if(width > height && (-pos.z / 4 * 10) % 10 > 5f)
-            //{
-            //    baseZ = Mathf.RoundToInt(-pos.z / 4);
-            //}
-            //// 클지 작을지는 확인해봐야 함
-            //else if (width == height && (-pos.z / 4 * 10) % 10 > 5f)
-            //{
-            //    baseZ = Mathf.RoundToInt(-pos.z / 4);
-            //}
-            //else
-            //{
-            //    baseZ = Mathf.FloorToInt(-pos.z / 4);
-            //}
-
-            ////int baseX = Mathf.FloorToInt(pos.x / 4);
-            ////baseZ = Mathf.FloorToInt(-pos.z / 4);
-
-            //if (width >= 3 && isAbandon == false)
-            //{
-            //    baseX -= 1;
-            //}
-            //if (height >= 3)
-            //{
-            //    //baseZ -= 1;
-            //    baseZ -= Mathf.FloorToInt(height / node.gridSize);
-            //}
-
-            //baseX = Mathf.FloorToInt(pos.x) / 4;
-            //baseZ = Mathf.FloorToInt(-pos.z) / 4;
+            if (height == indexSize)
+            {
+                baseX = Mathf.FloorToInt(pos.x / 4);
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        int x = baseX + j;
+                        tileNodes[i, x].type = node.type;
+                        //tileNodes[i, x] = new TileNode(node.type);
+                    }
+                }
+                continue;
+            }
 
             if (pos.x % 4 == 0)
             {
@@ -160,15 +97,6 @@ public class MiniMapManager : MonoBehaviour
                     {
                         baseX = Mathf.FloorToInt(pos.x / 4);
                     }
-                    // 4로 나눈 나머지가 2로 만들어야 함
-                    //if(pos.x % 4 >=1)
-                    //{
-                    //    baseX = Mathf.FloorToInt(pos.x + (2 - pos.x % 4));
-                    //}
-                    //else
-                    //{
-                    //    baseX = Mathf.FloorToInt(pos.x - (2 - pos.x % 4));
-                    //}
                     else
                     {
                         gridPosX = Mathf.FloorToInt(pos.x + (2 - pos.x % 4));
@@ -205,15 +133,6 @@ public class MiniMapManager : MonoBehaviour
                     {
                         baseZ = Mathf.FloorToInt(-pos.z / 4);
                     }
-                    // 4로 나눈 나머지가 2로 만들어야 함
-                    //if(pos.x % 4 >=1)
-                    //{
-                    //    baseX = Mathf.FloorToInt(pos.x + (2 - pos.x % 4));
-                    //}
-                    //else
-                    //{
-                    //    baseX = Mathf.FloorToInt(pos.x - (2 - pos.x % 4));
-                    //}
                     else
                     {
                         gridPosZ = Mathf.FloorToInt(-pos.z - (2 - (-pos.z % 4)));
@@ -236,15 +155,15 @@ public class MiniMapManager : MonoBehaviour
                 }
             }
 
-            if (width >= 3 && isAbandon == false)
+            if (width >= 3)
             {
                 //baseX -= 1;
-                baseX -= Mathf.FloorToInt(width / node.gridSize);
+                baseX -= Mathf.RoundToInt((float)width / 4);
             }
             if (height >= 3)
             {
                 //baseZ -= 1;
-                baseZ -= Mathf.FloorToInt(height / node.gridSize);
+                baseZ -= Mathf.RoundToInt((float)height / 4);
             }
 
             for (int i = 0; i < height; i++)
@@ -256,21 +175,24 @@ public class MiniMapManager : MonoBehaviour
                     if (x >= 0 && x < indexSize && z >= 0 && z < indexSize)
                     {
                         tileNodes[z, x].type = node.type;
+                        //tileNodes[z, x] = new TileNode(node.type);
                     }
                 }
             }
 
-            //    // 높이는 나중에
+            //높이는 나중에
 
         }
 
-        for(int i=0; i<indexSize; i++)
-        {
-            for(int j=0; j<indexSize; j++)
-            {
-                Debug.Log($"tileNodes[{i},{j}] = {tileNodes[i, j].type}");
-            }
-        }
+        //for (int i = 0; i < indexSize; i++)
+        //{
+        //    for (int j = 0; j < indexSize; j++)
+        //    {
+        //        Debug.Log($"tileNodes[{i},{j}] = {tileNodes[i, j].type}");
+        //    }
+        //}
+
+        ExamineRoadSide();
     }
 
     void Update()
@@ -278,15 +200,50 @@ public class MiniMapManager : MonoBehaviour
         
     }
 
-    void MakeTileSizeGrid(int size)
+    void ExamineRoadSide()
     {
-        if(size % 2== 0)
-        {
+        int sideIndex = 0;
+        int indexX = 0;
+        int indexY = 0;
+        bool isRoadExist = false;
+        int size = tileNodes.GetLength(0);
+        // 위
+        //for(int y = 0; y < size; y++)
+        //{
+        //    if (tileNodes[0, y].type == TileType.Road)
+        //    {
+        //        isRoadSide[sideIndex] = true;
+        //        sideIndex++;
+        //        break;
+        //    }
+        //    else
+        //    {
+        //        isRoadExist = false;
+        //    }
+        //}
 
-        }
-        else
+        // tileNode의 xIndex가 0일 때 yIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
+        // tileNode의 xIndex가 4일 때 yIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
+        // tileNode의 yIndex가 0일 때 xIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
+        // tileNode의 yIndex가 4일 때 xIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
+
+        for(int dir = 0; dir<isRoadSide.Length; dir++)
         {
 
         }
     }
+
+
+    //int DisConnectedRoadSideIndex(int arrSize)
+    //{
+    //    int examineIndex = 0;
+    //    while (examineIndex < arrSize)
+    //    {
+    //        if (tileNodes[0, examineIndex].type == TileType.Road)
+    //        {
+
+    //        }
+    //        examineIndex++;
+    //    }
+    //}
 }

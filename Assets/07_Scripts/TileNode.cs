@@ -41,6 +41,11 @@ public class TileNode : MonoBehaviour
     public TileNode()
     {
         type = TileType.None;
+    }
+
+    public TileNode(TileType tileType)
+    {
+        type = tileType;
         // 높이는 나중에
     }
 
@@ -48,4 +53,6 @@ public class TileNode : MonoBehaviour
     {
         return (int)type;
     }
+
+    // 길이 연결되었는지 아니면 끊겨있는지로 적들이 생성되는 여부를 결정해야 함
 }
