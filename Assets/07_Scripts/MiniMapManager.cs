@@ -202,35 +202,7 @@ public class MiniMapManager : MonoBehaviour
 
     void ExamineRoadSide()
     {
-        int sideIndex = 0;
-        int indexX = 0;
-        int indexY = 0;
-        bool isRoadExist = false;
-        int size = tileNodes.GetLength(0);
-        // 위
-        //for(int y = 0; y < size; y++)
-        //{
-        //    if (tileNodes[0, y].type == TileType.Road)
-        //    {
-        //        isRoadSide[sideIndex] = true;
-        //        sideIndex++;
-        //        break;
-        //    }
-        //    else
-        //    {
-        //        isRoadExist = false;
-        //    }
-        //}
 
-        // tileNode의 xIndex가 0일 때 yIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
-        // tileNode의 xIndex가 4일 때 yIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
-        // tileNode의 yIndex가 0일 때 xIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
-        // tileNode의 yIndex가 4일 때 xIndex를 0부터 4까지 검사하고 Road면 isRoadSide는 True로 설정
-
-        for(int dir = 0; dir<isRoadSide.Length; dir++)
-        {
-
-        }
     }
 
 
