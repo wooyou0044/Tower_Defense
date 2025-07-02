@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class MiniMapManager : MonoBehaviour
@@ -10,7 +10,21 @@ public class MiniMapManager : MonoBehaviour
 
     int indexSize;
 
+    public MinimapNode miniMapInfo { get; private set; }
+
     void Start()
+    {
+        miniMapInfo = new MinimapNode();
+        // 각각의 노드가 무슨 타입인지 나누기
+        DivideMinimapNode();
+    }
+
+    void Update()
+    {
+        
+    }
+
+    void DivideMinimapNode()
     {
         indexSize = 5;
         tileNodes = new TileNode[indexSize, indexSize];
@@ -90,10 +104,10 @@ public class MiniMapManager : MonoBehaviour
                 // 12x12 => 4   3
                 // 16X16 => 6   4
                 // 20X20 => 8   5
-                if(width % 2 == 0)
+                if (width % 2 == 0)
                 {
                     // 이건 있어야 할지 빼야 할지 이따가 결정
-                    if(pos.x % 4 == 2)
+                    if (pos.x % 4 == 2)
                     {
                         baseX = Mathf.FloorToInt(pos.x / 4);
                     }
@@ -106,7 +120,7 @@ public class MiniMapManager : MonoBehaviour
                 else
                 {
                     // 4로 나눈 나머지가 0으로 만들어야 함
-                    if(pos.x % 4 >= 2)
+                    if (pos.x % 4 >= 2)
                     {
                         gridPosX = Mathf.FloorToInt(pos.x - (pos.x % 4)) + 4;
                         baseX = gridPosX / 4;
@@ -180,8 +194,11 @@ public class MiniMapManager : MonoBehaviour
                 }
             }
 
+            miniMapInfo.TileNodes = tileNodes;
             //높이는 나중에
 
+            // 길이 있는 면 확인
+            miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
         }
 
         //for (int i = 0; i < indexSize; i++)
@@ -191,31 +208,55 @@ public class MiniMapManager : MonoBehaviour
         //        Debug.Log($"tileNodes[{i},{j}] = {tileNodes[i, j].type}");
         //    }
         //}
-
-        ExamineRoadSide();
     }
 
-    void Update()
+    HashSet<Direction> ExamineRoadSide(TileNode[,] nodes)
     {
-        
+        HashSet<Direction> edgeRoads = new HashSet<Direction>();
+
+        int sizeX = nodes.GetLength(0);
+        int sizeY = nodes.GetLength(1);
+
+        bool HasRoad(Func<int, (int x, int y)> coordFunc)
+        {
+            for(int i=0; i<Mathf.Max(sizeX, sizeY); i++)
+            {
+                var (x, y) = coordFunc(i);
+
+                if(x >= 0 && x < sizeX && y >= 0 && y < sizeY)
+                {
+                    if (nodes[x, y].type == TileType.Road)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        if(HasRoad(i => (i, 0)))
+        {
+            edgeRoads.Add(Direction.Left);
+        }
+        if(HasRoad(i => (i, sizeY - 1)))
+        {
+            edgeRoads.Add(Direction.Right);
+        }
+        if(HasRoad(i => (0, i)))
+        {
+            edgeRoads.Add(Direction.Top);
+        }
+        if(HasRoad(i => (sizeX - 1, i)))
+        {
+            edgeRoads.Add(Direction.Bottom);
+        }
+
+        // 검사용
+        foreach(var roadType in edgeRoads)
+        {
+            Debug.Log(roadType);
+        }
+
+        return edgeRoads;
     }
-
-    void ExamineRoadSide()
-    {
-
-    }
-
-
-    //int DisConnectedRoadSideIndex(int arrSize)
-    //{
-    //    int examineIndex = 0;
-    //    while (examineIndex < arrSize)
-    //    {
-    //        if (tileNodes[0, examineIndex].type == TileType.Road)
-    //        {
-
-    //        }
-    //        examineIndex++;
-    //    }
-    //}
 }

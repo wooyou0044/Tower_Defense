@@ -4349,6 +4349,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2066028785}
+  - component: {fileID: 2066028786}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -4371,6 +4372,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2066028786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066028784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90dc819c865d0ab449601586301efac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5227189669410580015
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4459,6 +4472,7 @@ SceneRoots:
   - {fileID: 11674369}
   - {fileID: 897237500}
   - {fileID: 5227189669410580015}
+  - {fileID: 325074119}
   - {fileID: 817150978}
   - {fileID: 1657551252}
   - {fileID: 607369733}
@@ -4474,7 +4488,6 @@ SceneRoots:
   - {fileID: 1457510854}
   - {fileID: 590671766}
   - {fileID: 1771952326}
-  - {fileID: 325074119}
   - {fileID: 191080777}
   - {fileID: 508025355}
   - {fileID: 1088937974}

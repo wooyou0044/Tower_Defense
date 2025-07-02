@@ -12,8 +12,18 @@ public enum Direction
 
 public class MinimapNode
 {
-    // 전체 맵 상의 위치
-    private Vector2Int gridPos;
     private TileNode[,] tileNodes;
-    private HashSet<Direction> OpdenEdges;
+    private HashSet<Direction> roadEdges;
+
+    public TileNode[,] TileNodes
+    {
+        get { return tileNodes; }
+        set { tileNodes = value; }
+    }
+
+    public HashSet<Direction> RoadEdges
+    {
+        get { return roadEdges; }
+        set { roadEdges = value; }
+    }
 }

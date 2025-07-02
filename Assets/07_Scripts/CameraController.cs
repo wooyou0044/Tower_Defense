@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] float edgeSize;
     [SerializeField] float moveDistance;
     [SerializeField] float rotateSpeed;
-    [SerializeField] MapManager mapManager;
+    [SerializeField] MapSpawner mapManager;
 
     Camera cam;
 
