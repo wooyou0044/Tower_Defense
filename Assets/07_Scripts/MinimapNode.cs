@@ -7,13 +7,15 @@ public enum Direction
     Top,
     Bottom,
     Left,
-    Right
+    Right,
+    None
 }
 
 public class MinimapNode
 {
     private TileNode[,] tileNodes;
     private HashSet<Direction> roadEdges;
+    private int mapSize;
 
     public TileNode[,] TileNodes
     {
@@ -25,5 +27,20 @@ public class MinimapNode
     {
         get { return roadEdges; }
         set { roadEdges = value; }
+    }
+
+    public int GetSize()
+    {
+        int size = 0;
+        foreach(var node in tileNodes)
+        {
+            if (node.type == TileType.Buildable)
+            {
+                size = (int)node.gridSize;
+            }
+        }
+
+        size *= tileNodes.GetLength(0);
+        return size;
     }
 }

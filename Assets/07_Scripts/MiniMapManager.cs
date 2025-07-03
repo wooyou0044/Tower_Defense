@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MiniMapManager : MonoBehaviour
@@ -12,11 +13,15 @@ public class MiniMapManager : MonoBehaviour
 
     public MinimapNode miniMapInfo { get; private set; }
 
-    void Start()
+    private void Awake()
     {
         miniMapInfo = new MinimapNode();
         // 각각의 노드가 무슨 타입인지 나누기
         DivideMinimapNode();
+    }
+
+    void Start()
+    {
     }
 
     void Update()
@@ -234,6 +239,7 @@ public class MiniMapManager : MonoBehaviour
             return false;
         }
 
+        // 왼쪽, 오른쪽, 위, 아래 기준을 Scene창에 맞춰 수정
         if(HasRoad(i => (i, 0)))
         {
             edgeRoads.Add(Direction.Left);
@@ -258,5 +264,26 @@ public class MiniMapManager : MonoBehaviour
         }
 
         return edgeRoads;
+    }
+
+    Direction RotateClockWiseDirection(Direction direct)
+    {
+        switch(direct)
+        {
+            case Direction.Top:
+                return Direction.Right;
+            case Direction.Right:
+                return Direction.Bottom;
+            case Direction.Bottom:
+                return Direction.Left;
+            case Direction.Left:
+                return Direction.Top;
+        }
+        return Direction.None;
+    }
+
+    public void RotateRoadEdgesClockWise()
+    {
+        miniMapInfo.RoadEdges = miniMapInfo.RoadEdges.Select(dir => RotateClockWiseDirection(dir)).ToHashSet();
     }
 }
