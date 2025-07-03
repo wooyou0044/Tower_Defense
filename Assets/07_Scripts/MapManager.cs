@@ -11,8 +11,6 @@ public class MapManager : MonoBehaviour
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     MiniMapManager[] miniMapMgrs;
 
-    int miniMapSize = 4 * 5;
-
     private void Awake()
     {
         
@@ -42,6 +40,7 @@ public class MapManager : MonoBehaviour
         // 랜덤 미니맵 생성
         int random = Random.Range(0, miniMaps.Length);
         GameObject newMiniMap = Instantiate(miniMaps[random]);
+        //GameObject newMiniMap = Instantiate(miniMaps[0]);
         MiniMapManager miniMapMgr = newMiniMap.GetComponent<MiniMapManager>();
         MinimapNode newMiniNode = miniMapMgr.miniMapInfo;
 
@@ -49,7 +48,7 @@ public class MapManager : MonoBehaviour
         int rotateCount = 0;
         while(rotateCount < (int)Direction.None)
         {
-            if(newMiniNode.RoadEdges.Contains(connectRoadDir))
+            if(miniMapMgr.miniMapInfo.RoadEdges.Contains(connectRoadDir))
             {
                 break;
             }
@@ -62,6 +61,7 @@ public class MapManager : MonoBehaviour
         {
             Debug.Log("붙일 수 있는 미니맵이 없음");
             //Destroy(newMiniMap);
+            rotateCount = 0;
             return;
         }
 

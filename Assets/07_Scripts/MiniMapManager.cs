@@ -52,6 +52,8 @@ public class MiniMapManager : MonoBehaviour
                 continue;
             }
             Vector3 pos = child.localPosition;
+            pos.x += 8f;
+            pos.z -= 8f;
             Vector3 scale = child.localScale;
 
             int width = Mathf.FloorToInt(scale.x / node.gridSize);
@@ -198,13 +200,12 @@ public class MiniMapManager : MonoBehaviour
                     }
                 }
             }
-
-            miniMapInfo.TileNodes = tileNodes;
-            //높이는 나중에
-
-            // 길이 있는 면 확인
-            miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
         }
+        miniMapInfo.TileNodes = tileNodes;
+        //높이는 나중에
+
+        // 길이 있는 면 확인
+        miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
 
         //for (int i = 0; i < indexSize; i++)
         //{
