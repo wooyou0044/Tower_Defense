@@ -5,21 +5,34 @@ using UnityEngine;
 
 public class MapManager : MonoBehaviour
 {
+    static MapManager _instance;
+
     [SerializeField] GameObject centralMiniMap;
     [SerializeField] GameObject[] miniMaps;
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     MiniMapManager[] miniMapMgrs;
 
+    public static MapManager Instance
+    {
+        get
+        {
+            return _instance;
+        }
+    }
+
     private void Awake()
     {
-        
+        if(_instance == null)
+        {
+            _instance = this;
+        }
     }
 
     void Start()
     {
         // 랜덤 미니맵 본부 밑에 하나 설치
-        MakeCentralBelowRandomMap();
+        MakeMiniMapBelowRandomMap(centralMiniMap);
     }
 
     void Update()
@@ -30,11 +43,11 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    void MakeCentralBelowRandomMap()
+    public void MakeMiniMapBelowRandomMap(GameObject miniMap)
     {
         // 본부 받아오기
-        Vector2 centralPos = new Vector2(centralMiniMap.transform.position.x, centralMiniMap.transform.position.z);
-        Direction centralRoadDir = centralMiniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
+        Vector2 centralPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
+        Direction centralRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
         Direction connectRoadDir = OppositeDirection(centralRoadDir);
 
         // 랜덤 미니맵 생성
@@ -67,12 +80,12 @@ public class MapManager : MonoBehaviour
 
         // 미니맵 설치
         Vector3 offset = GetOffsetDirection(centralRoadDir, newMiniNode.GetSize());
-        newMiniMap.transform.position = centralMiniMap.transform.position + offset;
+        newMiniMap.transform.position = miniMap.transform.position + offset;
 
         // 본부랑 게임 시작할때 생성할 랜덤 미니맵 Dictionary에 넣기
         dicMiniMaps = new Dictionary<Vector2, MinimapNode>();
         // 본부
-        dicMiniMaps.Add(centralPos, centralMiniMap.GetComponent<MiniMapManager>().miniMapInfo);
+        dicMiniMaps.Add(centralPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
 
         Vector2 newMiniMapPos = new Vector2(newMiniMap.transform.position.x, newMiniMap.transform.position.z);
         // 생성한 랜덤맵

@@ -259,10 +259,10 @@ public class MiniMapManager : MonoBehaviour
         }
 
         // °Ë»ç¿ë
-        foreach(var roadType in edgeRoads)
-        {
-            Debug.Log(roadType);
-        }
+        //foreach(var roadType in edgeRoads)
+        //{
+        //    Debug.Log(roadType);
+        //}
 
         return edgeRoads;
     }
