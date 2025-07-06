@@ -9,6 +9,7 @@ public class MapManager : MonoBehaviour
 
     [SerializeField] GameObject centralMiniMap;
     [SerializeField] GameObject[] miniMaps;
+    [SerializeField] Transform miniMapsParent;
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     MiniMapManager[] miniMapMgrs;
@@ -31,6 +32,9 @@ public class MapManager : MonoBehaviour
 
     void Start()
     {
+        // 본부랑 게임 시작할때 생성할 랜덤 미니맵 Dictionary에 넣기
+        dicMiniMaps = new Dictionary<Vector2, MinimapNode>();
+
         // 랜덤 미니맵 본부 밑에 하나 설치
         MakeMiniMapBelowRandomMap(centralMiniMap);
     }
@@ -43,16 +47,16 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public void MakeMiniMapBelowRandomMap(GameObject miniMap)
+    void MakeMiniMapBelowRandomMap(GameObject miniMap)
     {
         // 본부 받아오기
-        Vector2 centralPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
-        Direction centralRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
-        Direction connectRoadDir = OppositeDirection(centralRoadDir);
+        Vector2 minimapPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
+        Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
+        Direction connectRoadDir = OppositeDirection(minimapRoadDir);
 
         // 랜덤 미니맵 생성
         int random = Random.Range(0, miniMaps.Length);
-        GameObject newMiniMap = Instantiate(miniMaps[random]);
+        GameObject newMiniMap = Instantiate(miniMaps[random], miniMapsParent);
         //GameObject newMiniMap = Instantiate(miniMaps[0]);
         MiniMapManager miniMapMgr = newMiniMap.GetComponent<MiniMapManager>();
         MinimapNode newMiniNode = miniMapMgr.miniMapInfo;
@@ -79,17 +83,45 @@ public class MapManager : MonoBehaviour
         }
 
         // 미니맵 설치
-        Vector3 offset = GetOffsetDirection(centralRoadDir, newMiniNode.GetSize());
+        Vector3 offset = GetOffsetDirection(minimapRoadDir, newMiniNode.GetSize());
         newMiniMap.transform.position = miniMap.transform.position + offset;
 
-        // 본부랑 게임 시작할때 생성할 랜덤 미니맵 Dictionary에 넣기
-        dicMiniMaps = new Dictionary<Vector2, MinimapNode>();
-        // 본부
-        dicMiniMaps.Add(centralPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
+        // Dictionary에 등록
+        dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
 
         Vector2 newMiniMapPos = new Vector2(newMiniMap.transform.position.x, newMiniMap.transform.position.z);
         // 생성한 랜덤맵
         dicMiniMaps.Add(newMiniMapPos, newMiniNode);
+
+        // 미니맵 버튼 생성
+        MakeCreateMinimapButton(newMiniMap, connectRoadDir);
+    }
+
+    public void MakeRandomMinimap(Vector3 pos)
+    {
+        int random = Random.Range(0, miniMaps.Length);
+        GameObject newMiniMap = Instantiate(miniMaps[random], miniMapsParent);
+
+        MiniMapManager miniMapMgr = newMiniMap.GetComponent<MiniMapManager>();
+        MinimapNode newMiniNode = miniMapMgr.miniMapInfo;
+
+        newMiniMap.transform.position = pos;
+
+        dicMiniMaps.Add(pos, newMiniNode);
+    }
+
+    void MakeCreateMinimapButton(GameObject miniMap, Direction alreadyConnectDir)
+    {
+        MinimapNode newMiniNode = miniMap.GetComponent<MiniMapManager>().miniMapInfo;
+
+        foreach (var dir in newMiniNode.RoadEdges)
+        {
+            if (dir == alreadyConnectDir)
+            {
+                continue;
+            }
+            miniMap.GetComponent<MiniMapManager>().CreateMinimapButton(GetOffsetDirection(dir, newMiniNode.GetSize()));
+        }
     }
 
     Direction OppositeDirection(Direction direct)

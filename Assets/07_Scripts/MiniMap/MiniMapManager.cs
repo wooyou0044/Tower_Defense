@@ -10,18 +10,25 @@ public class MiniMapManager : MonoBehaviour
     bool[] isRoadSide;
 
     int indexSize;
+    GameObject makeMiniMapButton;
+    List<CreateMiniMap> createMapBtnlist;
 
     public MinimapNode miniMapInfo { get; private set; }
 
     private void Awake()
     {
         miniMapInfo = new MinimapNode();
+        createMapBtnlist = new List<CreateMiniMap>();
+        // 미니맵 만들수 있는 버튼 게임 오브젝트 저장
+        makeMiniMapButton = Resources.Load<GameObject>("CanBuildMiniMap");
+
         // 각각의 노드가 무슨 타입인지 나누기
         DivideMinimapNode();
     }
 
     void Start()
     {
+
     }
 
     void Update()
@@ -286,5 +293,31 @@ public class MiniMapManager : MonoBehaviour
     public void RotateRoadEdgesClockWise()
     {
         miniMapInfo.RoadEdges = miniMapInfo.RoadEdges.Select(dir => RotateClockWiseDirection(dir)).ToHashSet();
+    }
+
+    // 길이 연결되어 있지만 맵끼리 연결되지 않은 곳에 맵 생성 버튼 만들기
+    public void CreateMinimapButton(Vector3 createPos)
+    {
+        GameObject button = Instantiate(makeMiniMapButton, transform);
+        Vector3 rotatedOffset = transform.InverseTransformDirection(createPos);
+        Vector3 buttonPos = new Vector3(rotatedOffset.x, rotatedOffset.y - 1, rotatedOffset.z);
+        button.transform.localPosition = buttonPos;
+
+        CreateMiniMap buttonMinimap = button.GetComponent<CreateMiniMap>();
+
+        createMapBtnlist.Add(buttonMinimap);
+
+        button.SetActive(false);
+    }
+
+    public void RemoveCreateMapBtnList(CreateMiniMap miniMap)
+    {
+        Debug.Log("이전의 List 개수 : " + createMapBtnlist.Count);
+        foreach(var button in createMapBtnlist)
+        {
+            button.gameObject.SetActive(false);
+        }
+        createMapBtnlist.Remove(miniMap);
+        Debug.Log("삭제한 이후 List 개수 : " + createMapBtnlist.Count);
     }
 }
