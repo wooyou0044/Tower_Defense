@@ -296,7 +296,7 @@ public class MiniMapManager : MonoBehaviour
     }
 
     // 길이 연결되어 있지만 맵끼리 연결되지 않은 곳에 맵 생성 버튼 만들기
-    public void CreateMinimapButton(Vector3 createPos)
+    public void CreateMinimapButton(Vector3 createPos, Direction createDirect)
     {
         GameObject button = Instantiate(makeMiniMapButton, transform);
         Vector3 rotatedOffset = transform.InverseTransformDirection(createPos);
@@ -304,10 +304,10 @@ public class MiniMapManager : MonoBehaviour
         button.transform.localPosition = buttonPos;
 
         CreateMiniMap buttonMinimap = button.GetComponent<CreateMiniMap>();
-
+        buttonMinimap.InitializeDirection(createDirect);
         createMapBtnlist.Add(buttonMinimap);
 
-        button.SetActive(false);
+        //button.SetActive(false);
     }
 
     public void RemoveCreateMapBtnList(CreateMiniMap miniMap)
@@ -320,4 +320,5 @@ public class MiniMapManager : MonoBehaviour
         createMapBtnlist.Remove(miniMap);
         Debug.Log("삭제한 이후 List 개수 : " + createMapBtnlist.Count);
     }
+
 }

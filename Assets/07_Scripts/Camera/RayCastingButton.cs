@@ -5,6 +5,8 @@ using UnityEngine;
 public class RayCastingButton : MonoBehaviour
 {
     Camera mainCam;
+    CreateMiniMap currentHover = null;
+
     void Start()
     {
         mainCam = GetComponent<Camera>();
@@ -12,20 +14,54 @@ public class RayCastingButton : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
-        {
-            Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+        HoverCreateMinimapButton();
+    }
 
-            if (Physics.Raycast(ray, out hit))
+    void HoverCreateMinimapButton()
+    {
+        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        int minimapLayerMask = LayerMask.GetMask("MinimapButton");
+        Debug.DrawRay(ray.origin, ray.direction * 300f, Color.red);
+        if (Physics.Raycast(ray, out hit, 300f, minimapLayerMask))
+        {
+            CreateMiniMap mapBtn = hit.transform.GetComponent<CreateMiniMap>();
+            if (mapBtn != null)
             {
-                CreateMiniMap mapBtn = hit.transform.GetComponent<CreateMiniMap>();
-                if(mapBtn != null)
+                //mapBtn.PressCreateMinimap();
+                if(currentHover != mapBtn)
                 {
-                    Debug.Log("´­¸²");
-                    mapBtn.PressCreateMinimap();
+                    if(currentHover != null)
+                    {
+                        SetActiveCreateMinimapButton(true, currentHover.gameObject);
+                    }
+                    currentHover = mapBtn;
+                    SetActiveCreateMinimapButton(false, currentHover.gameObject);
+                    currentHover.OnMouseHoverEnter();
                 }
             }
+            //else if(currentHover != null)
+            //{
+            //    currentHover.OnMouseHoverExit();
+            //    currentHover = null;
+            //}    
         }
+        else if (currentHover != null)
+        {
+            currentHover.OnMouseHoverExit();
+            SetActiveCreateMinimapButton(true, currentHover.gameObject);
+            currentHover = null;
+        }
+    }
+
+    void SetActiveCreateMinimapButton(bool isActive, GameObject button)
+    {
+        GameObject child = button.transform.GetChild(0).gameObject;
+        child.SetActive(isActive);
+    }
+
+    void RotateMinimap()
+    {
+
     }
 }
