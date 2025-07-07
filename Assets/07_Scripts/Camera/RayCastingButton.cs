@@ -46,7 +46,7 @@ public class RayCastingButton : MonoBehaviour
             //    currentHover = null;
             //}    
         }
-        else if (currentHover != null)
+        else if (currentHover != null && currentHover.IsMadeMinimap == false)
         {
             currentHover.OnMouseHoverExit();
             SetActiveCreateMinimapButton(true, currentHover.gameObject);

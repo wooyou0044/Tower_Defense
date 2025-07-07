@@ -6,15 +6,41 @@ public class CreateMiniMap : MonoBehaviour
 {
     MiniMapManager parentMinimapMgr;
     Direction currentDirect;
+    MinimapSpawnStruct miniMapStruct;
+
+    bool isMouseOn;
+    public bool IsMadeMinimap { get; private set; }
 
     void Start()
     {
         parentMinimapMgr = transform.parent.GetComponent<MiniMapManager>();
+
+        miniMapStruct = new MinimapSpawnStruct
+        {
+            spawnPos = transform.position + Vector3.up,
+            connectDireciton = currentDirect,
+            buttonRef = this
+        };
+
     }
 
-    void Update()
+    private void Update()
     {
-        
+        if (isMouseOn == true)
+        {
+            if(Input.GetMouseButtonDown(1))
+            {
+                MapManager.Instance.RotateNewMinimap(currentDirect);
+            }
+            if(Input.GetMouseButtonDown(0))
+            {
+                if(MapManager.Instance.IsConnectedRoad(currentDirect))
+                {
+                    PressCreateMinimap();
+                    IsMadeMinimap = true;
+                }
+            }
+        }
     }
 
     public void InitializeDirection(Direction direct)
@@ -24,36 +50,23 @@ public class CreateMiniMap : MonoBehaviour
 
     public void PressCreateMinimap()
     {
-        Vector3 miniMapPos = transform.position + new Vector3(0, 1, 0);
-        Debug.Log("Position : " + miniMapPos);
-        //MapManager.Instance.MakeRandomMinimap(miniMapPos);
-
         parentMinimapMgr.RemoveCreateMapBtnList(this);
+        MapManager.Instance.AddDictionaryNewMinimap();
     }
 
     public void OnMouseHoverEnter()
     {
-        MinimapSpawnContext ctx = new MinimapSpawnContext
-        {
-            spawnPos = transform.position + Vector3.up,
-            connectDireciton = currentDirect,
-            isAlreadyMade = MapManager.Instance.isAlreadyMinimapMade,
-            buttonRef = this
-        };
-        //Vector3 miniMapPos = transform.position + new Vector3(0, 1, 0);
-        //Debug.Log("Position : " + miniMapPos);
-        //bool isAlreadyMade = MapManager.Instance.isAlreadyMinimapMade;
-        MapManager.Instance.MakeOrMoveRandomMinimap(ctx);
-        if (ctx.isAlreadyMade == true)
+        MapManager.Instance.MakeOrMoveRandomMinimap(miniMapStruct);
+        if (MapManager.Instance.isAlreadyMinimapMade == true)
         {
             MapManager.Instance.SetActiveNewMinimap(true);
         }
-
-        // 회전시키기
+        isMouseOn = true;
     }
 
     public void OnMouseHoverExit()
     {
         MapManager.Instance.SetActiveNewMinimap(false);
+        isMouseOn = false;
     }
 }

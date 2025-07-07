@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public struct MinimapSpawnContext
+public struct MinimapSpawnStruct
 {
     public Vector3 spawnPos;
     public Direction connectDireciton;
-    public bool isAlreadyMade;
     public CreateMiniMap buttonRef;
 }
 
@@ -22,8 +22,10 @@ public class MapManager : MonoBehaviour
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     MiniMapManager[] miniMapMgrs;
+    MiniMapManager minimapMgr;
+    //List<Material> canBuildMats;
 
-    int newMaterialIndex;
+    Material originMat;
 
     public GameObject newMinimap { get; private set; }
 
@@ -56,14 +58,6 @@ public class MapManager : MonoBehaviour
         MakeMiniMapBelowRandomMap(centralMiniMap);
     }
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-
-        }
-    }
-
     void MakeMiniMapBelowRandomMap(GameObject miniMap)
     {
         // 본부 받아오기
@@ -75,18 +69,18 @@ public class MapManager : MonoBehaviour
         int random = Random.Range(0, miniMaps.Length);
         newMinimap = Instantiate(miniMaps[random], miniMapsParent);
         //GameObject newMiniMap = Instantiate(miniMaps[0]);
-        MiniMapManager miniMapMgr = newMinimap.GetComponent<MiniMapManager>();
-        MinimapNode newMiniNode = miniMapMgr.miniMapInfo;
+        minimapMgr = newMinimap.GetComponent<MiniMapManager>();
+        MinimapNode newMiniNode = minimapMgr.miniMapInfo;
 
         // 90도씩 회전하면서 맞닿는 방향 나올때까지 반복
         int rotateCount = 0;
         while (rotateCount < (int)Direction.None)
         {
-            if (miniMapMgr.miniMapInfo.RoadEdges.Contains(connectRoadDir))
+            if (minimapMgr.miniMapInfo.RoadEdges.Contains(connectRoadDir))
             {
                 break;
             }
-            ExamineRotate(miniMapMgr);
+            ExamineRotate(minimapMgr);
             rotateCount++;
         }
 
@@ -115,53 +109,42 @@ public class MapManager : MonoBehaviour
         newMinimap = null;
     }
 
-    public void ExamineRotate(MiniMapManager minimapMgr)
+    public void ExamineRotate(MiniMapManager mapMgr)
     {
-        minimapMgr.RotateRoadEdgesClockWise();
-        newMinimap.transform.Rotate(Vector3.up, 90);
+        Debug.Log("Rotate 함수 호출됨");
+        mapMgr.RotateRoadEdgesClockWise();
+        mapMgr.gameObject.transform.Rotate(Vector3.up, 90);
     }
 
-    public void MakeOrMoveRandomMinimap(MinimapSpawnContext ctx)
+    public void MakeOrMoveRandomMinimap(MinimapSpawnStruct spawnStruct)
     {
-        if (ctx.isAlreadyMade == true)
+        if(isAlreadyMinimapMade == false)
         {
-            newMinimap.transform.position = ctx.spawnPos;
-            return;
+            CreateRandomMinimap();
+            isAlreadyMinimapMade = true;
         }
+        newMinimap.transform.position = spawnStruct.spawnPos;
 
+        Direction buttonDir = spawnStruct.connectDireciton;
+        UpdateMaterialConnection(buttonDir);
+    }
+
+    public void CreateRandomMinimap()
+    {
         int random = Random.Range(0, miniMaps.Length);
         newMinimap = Instantiate(miniMaps[random], miniMapsParent);
 
-        isAlreadyMinimapMade = true;
+        minimapMgr = newMinimap.GetComponent<MiniMapManager>();
+        MinimapNode newMiniNode = minimapMgr.miniMapInfo;
 
-        MiniMapManager miniMapMgr = newMinimap.GetComponent<MiniMapManager>();
-        MinimapNode newMiniNode = miniMapMgr.miniMapInfo;
+        minimapMgr.ChangeMaterial(miniMapMaterial);
+    }
 
-        newMinimap.transform.position = ctx.spawnPos;
+    void UpdateMaterialConnection(Direction dir)
+    {
+        bool isConnected = IsConnectedRoad(dir);
 
-        // 기존 Material외 맵 설치할때 생길 수 있는 Material 추가
-        for(int i=0; i<newMinimap.transform.childCount; i++)
-        {
-            GameObject childNode = newMinimap.transform.GetChild(i).gameObject;
-            TileType childNodeType = childNode.GetComponent<TileNode>().type;
-            if(childNodeType == TileType.Road)
-            {
-                continue;
-            }
-            MeshRenderer rend = childNode.GetComponent<MeshRenderer>();
-            Material originMat = rend.material;
-
-            Material newMat = new Material(miniMapMaterial);
-            // Texture 넣기
-            newMat.SetTexture("_MainTexture", originMat.GetTexture("_BaseMap"));
-            newMat.SetFloat("_isBuildMinimap", 1f);
-            // 현재 만들어진 새로운 미니맵의 방향과 + 버튼의 반대방향이 같으면 초록색, 다르면 빨간색으로 해야 함
-            
-            Material[] newMats = new Material[2] { originMat, newMat };
-            rend.materials = newMats;
-            newMaterialIndex = 1;
-        }
-        //dicMiniMaps.Add(pos, newMiniNode);
+        minimapMgr.TurnIsRoadConnect(isConnected);
     }
 
     public void SetActiveNewMinimap(bool isActive)
@@ -185,6 +168,32 @@ public class MapManager : MonoBehaviour
             }
             miniMap.GetComponent<MiniMapManager>().CreateMinimapButton(GetOffsetDirection(dir, newMiniNode.GetSize()), dir);
         }
+    }
+
+    public void RotateNewMinimap(Direction dir)
+    {
+        ExamineRotate(minimapMgr);
+        UpdateMaterialConnection(dir);
+    }
+
+    public bool IsConnectedRoad(Direction dir)
+    {
+        Direction oppositeButtonDir = OppositeDirection(dir);
+        bool isConnected = minimapMgr.miniMapInfo.RoadEdges.Contains(oppositeButtonDir);
+
+        return isConnected;
+    }
+
+    public void AddDictionaryNewMinimap()
+    {
+        Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
+        MinimapNode node = newMinimap.GetComponent<MiniMapManager>().miniMapInfo;
+
+        // 생성한 랜덤맵
+        dicMiniMaps.Add(newMiniMapPos, node);
+        Debug.Log("Dictionary 개수 : " + dicMiniMaps.Count);
+
+        minimapMgr.ResetOriginMaterial();
     }
 
     Direction OppositeDirection(Direction direct)

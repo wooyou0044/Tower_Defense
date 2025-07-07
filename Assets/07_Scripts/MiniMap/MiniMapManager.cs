@@ -13,6 +13,9 @@ public class MiniMapManager : MonoBehaviour
     GameObject makeMiniMapButton;
     List<CreateMiniMap> createMapBtnlist;
 
+    List<Material> canBuildMats;
+    Material originMat;
+
     public MinimapNode miniMapInfo { get; private set; }
 
     private void Awake()
@@ -321,4 +324,52 @@ public class MiniMapManager : MonoBehaviour
         Debug.Log("삭제한 이후 List 개수 : " + createMapBtnlist.Count);
     }
 
+    public void ChangeMaterial(Material newMaterial)
+    {
+        canBuildMats = new List<Material>();
+
+        // 기존 Material외 맵 설치할때 생길 수 있는 Material 추가
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            GameObject childNode = transform.GetChild(i).gameObject;
+            TileType childNodeType = childNode.GetComponent<TileNode>().type;
+            if (childNodeType == TileType.Road)
+            {
+                continue;
+            }
+            MeshRenderer rend = childNode.GetComponent<MeshRenderer>();
+            originMat = rend.material;
+
+            Material newMat = new Material(newMaterial);
+            // Texture 넣기
+            newMat.SetTexture("_MainTexture", originMat.GetTexture("_BaseMap"));
+            newMat.SetFloat("_isBuildMinimap", 1f);
+            Material[] newMats = new Material[2] { originMat, newMat };
+            rend.materials = newMats;
+
+            canBuildMats.Add(newMats[1]);
+        }
+    }
+
+    public void TurnIsRoadConnect(bool isConnected)
+    {
+        // 기존 Material외 맵 설치할때 생길 수 있는 Material 추가
+        for (int i = 0; i < canBuildMats.Count; i++)
+        {
+            canBuildMats[i].SetFloat("_isRoadConnect", isConnected ? 1f : 0f);
+        }
+    }
+
+    public void ResetOriginMaterial()
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            if (transform.GetChild(i).GetComponent<TileNode>().type == TileType.Road)
+            {
+                continue;
+            }
+            MeshRenderer rend = transform.GetChild(i).GetComponent<MeshRenderer>();
+            rend.materials = new Material[] { originMat };
+        }
+    }
 }
