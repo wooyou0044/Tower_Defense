@@ -64,7 +64,7 @@ public class MapManager : MonoBehaviour
     void MakeMiniMapBelowRandomMap(GameObject miniMap)
     {
         // 본부 받아오기
-        Vector2 minimapPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
+        //Vector2 minimapPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
         Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
         Direction connectRoadDir = OppositeDirection(minimapRoadDir);
 
@@ -100,7 +100,7 @@ public class MapManager : MonoBehaviour
         newMinimap.transform.position = miniMap.transform.position + offset;
 
         // Dictionary에 등록
-        dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
+        //dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
 
         Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
         // 생성한 랜덤맵

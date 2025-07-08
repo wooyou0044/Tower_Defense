@@ -87,6 +87,12 @@ public class MiniMapManager : MonoBehaviour
                         int z = baseZ + i;
                         tileNodes[z, j].type = node.type;
                         //tileNodes[z, j] = new TileNode(node.type);
+
+                        if (node.type == TileType.Road || tileNodes[z, j].height > ExamineHeight(pos.y, scale.y))
+                        {
+                            continue;
+                        }
+                        tileNodes[z, j].height = ExamineHeight(pos.y, scale.y);
                     }
                 }
                 continue;
@@ -102,6 +108,12 @@ public class MiniMapManager : MonoBehaviour
                         int x = baseX + j;
                         tileNodes[i, x].type = node.type;
                         //tileNodes[i, x] = new TileNode(node.type);
+
+                        if (node.type == TileType.Road || tileNodes[i, x].height > ExamineHeight(pos.y, scale.y))
+                        {
+                            continue;
+                        }
+                        tileNodes[i, x].height = ExamineHeight(pos.y, scale.y);
                     }
                 }
                 continue;
@@ -205,7 +217,7 @@ public class MiniMapManager : MonoBehaviour
                     {
                         tileNodes[z, x].type = node.type;
                         //tileNodes[z, x] = new TileNode(node.type);
-                        if(node.type == TileType.Road)
+                        if(node.type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
@@ -220,13 +232,13 @@ public class MiniMapManager : MonoBehaviour
         // 길이 있는 면 확인
         miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
 
-        for (int i = 0; i < indexSize; i++)
-        {
-            for (int j = 0; j < indexSize; j++)
-            {
-                Debug.Log($"tileNodes[{i},{j}].height = {tileNodes[i, j].height}");
-            }
-        }
+        //for (int i = 0; i < indexSize; i++)
+        //{
+        //    for (int j = 0; j < indexSize; j++)
+        //    {
+        //        Debug.Log($"tileNodes[{i},{j}].height = {tileNodes[i, j].height}");
+        //    }
+        //}
     }
 
     int ExamineHeight(float posY, float scaleY)
