@@ -13,18 +13,7 @@ public class TileNode : MonoBehaviour
 {
     public TileType type;
 
-    public float height
-    {
-        get
-        {
-            float baseHeight = 2f;
-            if(type != TileType.Buildable)
-            {
-                return 0;
-            }
-            return Mathf.RoundToInt(transform.localScale.y / baseHeight);
-        }
-    }
+    public float height { get; set; }
 
     public float gridSize
     {

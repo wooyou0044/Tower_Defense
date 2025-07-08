@@ -8,6 +8,7 @@ public class CreateMiniMap : MonoBehaviour
     Direction currentDirect;
     MinimapSpawnStruct miniMapStruct;
 
+    Vector2 currentPos;
     bool isMouseOn;
     public bool IsMadeMinimap { get; private set; }
 
@@ -22,6 +23,7 @@ public class CreateMiniMap : MonoBehaviour
             buttonRef = this
         };
 
+        currentPos = new Vector2(transform.position.x, transform.position.z);
     }
 
     private void Update()
@@ -34,7 +36,7 @@ public class CreateMiniMap : MonoBehaviour
             }
             if(Input.GetMouseButtonDown(0))
             {
-                if(MapManager.Instance.IsConnectedRoad(currentDirect))
+                if(MapManager.Instance.IsConnectedRoad(currentPos))
                 {
                     PressCreateMinimap();
                     IsMadeMinimap = true;
@@ -50,7 +52,7 @@ public class CreateMiniMap : MonoBehaviour
 
     public void PressCreateMinimap()
     {
-        parentMinimapMgr.RemoveCreateMapBtnList(this);
+        MapManager.Instance.RemoveCreateMapBtnList(this);
         MapManager.Instance.AddDictionaryNewMinimap();
     }
 

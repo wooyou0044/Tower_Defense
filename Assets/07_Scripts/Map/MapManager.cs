@@ -23,7 +23,8 @@ public class MapManager : MonoBehaviour
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     MiniMapManager[] miniMapMgrs;
     MiniMapManager minimapMgr;
-    //List<Material> canBuildMats;
+    List<CreateMiniMap> createMapBtnlist;
+    Direction alreadyConnectedDir;
 
     Material originMat;
 
@@ -47,6 +48,8 @@ public class MapManager : MonoBehaviour
         }
 
         isAlreadyMinimapMade = false;
+
+        createMapBtnlist = new List<CreateMiniMap>();
     }
 
     void Start()
@@ -68,7 +71,7 @@ public class MapManager : MonoBehaviour
         // 랜덤 미니맵 생성
         int random = Random.Range(0, miniMaps.Length);
         newMinimap = Instantiate(miniMaps[random], miniMapsParent);
-        //GameObject newMiniMap = Instantiate(miniMaps[0]);
+        //newMinimap = Instantiate(miniMaps[9]);
         minimapMgr = newMinimap.GetComponent<MiniMapManager>();
         MinimapNode newMiniNode = minimapMgr.miniMapInfo;
 
@@ -126,7 +129,7 @@ public class MapManager : MonoBehaviour
         newMinimap.transform.position = spawnStruct.spawnPos;
 
         Direction buttonDir = spawnStruct.connectDireciton;
-        UpdateMaterialConnection(buttonDir);
+        UpdateMaterialConnection();
     }
 
     public void CreateRandomMinimap()
@@ -140,9 +143,12 @@ public class MapManager : MonoBehaviour
         minimapMgr.ChangeMaterial(miniMapMaterial);
     }
 
-    void UpdateMaterialConnection(Direction dir)
+    void UpdateMaterialConnection()
     {
-        bool isConnected = IsConnectedRoad(dir);
+        Vector3 newMinimapPos = newMinimap.transform.position;
+        Vector2 newMinimapPosXZ = new Vector2(newMinimapPos.x, newMinimapPos.z);
+
+        bool isConnected = IsConnectedRoad(newMinimapPosXZ);
 
         minimapMgr.TurnIsRoadConnect(isConnected);
     }
@@ -156,9 +162,37 @@ public class MapManager : MonoBehaviour
         newMinimap.SetActive(isActive);
     }
 
-    void MakeCreateMinimapButton(GameObject miniMap, Direction alreadyConnectDir)
+    public void AddCreateMapBtnList(CreateMiniMap miniMapBtn)
     {
-        MinimapNode newMiniNode = miniMap.GetComponent<MiniMapManager>().miniMapInfo;
+        createMapBtnlist.Add(miniMapBtn);
+    }
+
+    public void RemoveCreateMapBtnList(CreateMiniMap miniMapBtn)
+    {
+        Debug.Log("이전의 List 개수 : " + createMapBtnlist.Count);
+        foreach (var button in createMapBtnlist)
+        {
+            button.gameObject.SetActive(false);
+        }
+        createMapBtnlist.Remove(miniMapBtn);
+        Debug.Log("삭제한 이후 List 개수 : " + createMapBtnlist.Count);
+    }
+
+    bool IsOverlapMakeButton(Vector3 pos)
+    {
+        foreach(var button in createMapBtnlist)
+        {
+            if(button.transform.position == pos)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void MakeCreateMinimapButton(GameObject newMinimap, Direction alreadyConnectDir)
+    {
+        MinimapNode newMiniNode = newMinimap.GetComponent<MiniMapManager>().miniMapInfo;
 
         foreach (var dir in newMiniNode.RoadEdges)
         {
@@ -166,22 +200,52 @@ public class MapManager : MonoBehaviour
             {
                 continue;
             }
-            miniMap.GetComponent<MiniMapManager>().CreateMinimapButton(GetOffsetDirection(dir, newMiniNode.GetSize()), dir);
+            Vector3 buttonPos = newMinimap.transform.position + GetOffsetDirection(dir, newMiniNode.GetSize());
+            // 기존에 있는 버튼과 겹치면 버튼 생성 안 하고 넘어감
+            if (IsOverlapMakeButton(buttonPos + Vector3.down))
+            {
+                continue;
+            }
+            // 해당 위치에 미니맵이 있으면 버튼 생성 안 하고 넘어감
+            if(dicMiniMaps.ContainsKey(new Vector2(buttonPos.x, buttonPos.z)))
+            {
+                continue;
+            }
+            newMinimap.GetComponent<MiniMapManager>().CreateMinimapButton(GetOffsetDirection(dir, newMiniNode.GetSize()), dir);
         }
+        Debug.Log("새로운 미니맵 설치 이후 List 개수 : " + createMapBtnlist.Count);
     }
 
     public void RotateNewMinimap(Direction dir)
     {
         ExamineRotate(minimapMgr);
-        UpdateMaterialConnection(dir);
+        UpdateMaterialConnection();
     }
 
-    public bool IsConnectedRoad(Direction dir)
+    public bool IsConnectedRoad(Vector2 pos)
     {
-        Direction oppositeButtonDir = OppositeDirection(dir);
-        bool isConnected = minimapMgr.miniMapInfo.RoadEdges.Contains(oppositeButtonDir);
+        MinimapNode newMapNode = minimapMgr.miniMapInfo;
 
-        return isConnected;
+        foreach(Direction dir in System.Enum.GetValues(typeof(Direction)))
+        {
+            Vector3 offset = GetOffsetDirection(dir, newMapNode.GetSize());
+            Vector2 neighborPos = pos + new Vector2(offset.x, offset.z);
+            if(dicMiniMaps.TryGetValue(neighborPos, out MinimapNode neighbor))
+            {
+                Debug.Log("이웃 위치 : " + neighborPos);
+                Direction opposite = OppositeDirection(dir);
+
+                bool isNewHasRoad = newMapNode.RoadEdges.Contains(dir);
+                bool isNeighborHasRoad = neighbor.RoadEdges.Contains(opposite);
+
+                if(isNewHasRoad != isNeighborHasRoad)
+                {
+                    return false;
+                }
+            }
+            alreadyConnectedDir = dir;
+        }
+        return true;
     }
 
     public void AddDictionaryNewMinimap()
@@ -194,6 +258,33 @@ public class MapManager : MonoBehaviour
         Debug.Log("Dictionary 개수 : " + dicMiniMaps.Count);
 
         minimapMgr.ResetOriginMaterial();
+
+        // 길이 이어진 곳 외에 버튼 생성
+        MakeCreateMinimapButton(newMinimap, alreadyConnectedDir);
+
+        // 기존의 정보 지우기
+        ResetNewMinimap();
+
+        // 임시로 테스트
+        SetActiveAllCreateMinimapBtn(true);
+    }
+
+    void ResetNewMinimap()
+    {
+        newMinimap = null;
+        isAlreadyMinimapMade = false;
+    }
+
+    public void SetActiveAllCreateMinimapBtn(bool isActive)
+    {
+        foreach(var btn in createMapBtnlist)
+        {
+            if(btn.gameObject.activeSelf == isActive)
+            {
+                continue;
+            }
+            btn.gameObject.SetActive(isActive);
+        }
     }
 
     Direction OppositeDirection(Direction direct)
@@ -229,4 +320,6 @@ public class MapManager : MonoBehaviour
         }
         return Vector3.zero;
     }
+
+
 }

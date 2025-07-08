@@ -11,7 +11,6 @@ public class MiniMapManager : MonoBehaviour
 
     int indexSize;
     GameObject makeMiniMapButton;
-    List<CreateMiniMap> createMapBtnlist;
 
     List<Material> canBuildMats;
     Material originMat;
@@ -21,7 +20,6 @@ public class MiniMapManager : MonoBehaviour
     private void Awake()
     {
         miniMapInfo = new MinimapNode();
-        createMapBtnlist = new List<CreateMiniMap>();
         // 미니맵 만들수 있는 버튼 게임 오브젝트 저장
         makeMiniMapButton = Resources.Load<GameObject>("CanBuildMiniMap");
 
@@ -308,20 +306,11 @@ public class MiniMapManager : MonoBehaviour
 
         CreateMiniMap buttonMinimap = button.GetComponent<CreateMiniMap>();
         buttonMinimap.InitializeDirection(createDirect);
-        createMapBtnlist.Add(buttonMinimap);
 
+        MapManager.Instance.AddCreateMapBtnList(buttonMinimap);
+
+        // 임시로 꺼둠
         //button.SetActive(false);
-    }
-
-    public void RemoveCreateMapBtnList(CreateMiniMap miniMap)
-    {
-        Debug.Log("이전의 List 개수 : " + createMapBtnlist.Count);
-        foreach(var button in createMapBtnlist)
-        {
-            button.gameObject.SetActive(false);
-        }
-        createMapBtnlist.Remove(miniMap);
-        Debug.Log("삭제한 이후 List 개수 : " + createMapBtnlist.Count);
     }
 
     public void ChangeMaterial(Material newMaterial)

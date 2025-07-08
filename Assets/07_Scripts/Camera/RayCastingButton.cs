@@ -33,6 +33,7 @@ public class RayCastingButton : MonoBehaviour
                 {
                     if(currentHover != null)
                     {
+                        currentHover.OnMouseHoverExit();
                         SetActiveCreateMinimapButton(true, currentHover.gameObject);
                     }
                     currentHover = mapBtn;
@@ -58,10 +59,5 @@ public class RayCastingButton : MonoBehaviour
     {
         GameObject child = button.transform.GetChild(0).gameObject;
         child.SetActive(isActive);
-    }
-
-    void RotateMinimap()
-    {
-
     }
 }
