@@ -205,6 +205,11 @@ public class MiniMapManager : MonoBehaviour
                     {
                         tileNodes[z, x].type = node.type;
                         //tileNodes[z, x] = new TileNode(node.type);
+                        if(node.type == TileType.Road)
+                        {
+                            continue;
+                        }
+                        tileNodes[z, x].height = ExamineHeight(pos.y, scale.y);
                     }
                 }
             }
@@ -215,13 +220,35 @@ public class MiniMapManager : MonoBehaviour
         // 길이 있는 면 확인
         miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
 
-        //for (int i = 0; i < indexSize; i++)
-        //{
-        //    for (int j = 0; j < indexSize; j++)
-        //    {
-        //        Debug.Log($"tileNodes[{i},{j}] = {tileNodes[i, j].type}");
-        //    }
-        //}
+        for (int i = 0; i < indexSize; i++)
+        {
+            for (int j = 0; j < indexSize; j++)
+            {
+                Debug.Log($"tileNodes[{i},{j}].height = {tileNodes[i, j].height}");
+            }
+        }
+    }
+
+    int ExamineHeight(float posY, float scaleY)
+    {
+        float examineY = posY + scaleY / 2;
+
+        if(examineY <= 3)
+        {
+            return  1;
+        }
+        else if(examineY <= 5)
+        {
+            return 2;
+        }
+        else if(examineY <= 10)
+        {
+            return 3;
+        }
+        else
+        {
+            return 4;
+        }
     }
 
     HashSet<Direction> ExamineRoadSide(TileNode[,] nodes)

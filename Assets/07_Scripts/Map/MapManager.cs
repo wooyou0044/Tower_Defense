@@ -232,7 +232,6 @@ public class MapManager : MonoBehaviour
             Vector2 neighborPos = pos + new Vector2(offset.x, offset.z);
             if(dicMiniMaps.TryGetValue(neighborPos, out MinimapNode neighbor))
             {
-                Debug.Log("ÀÌ¿ô À§Ä¡ : " + neighborPos);
                 Direction opposite = OppositeDirection(dir);
 
                 bool isNewHasRoad = newMapNode.RoadEdges.Contains(dir);
