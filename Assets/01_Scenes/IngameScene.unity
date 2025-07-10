@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1332,7 +1332,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 427356382}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2066028786}
+        m_TargetAssemblyTypeName: MapManager, Assembly-CSharp
+        m_MethodName: ChangeMinimap
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &434524788
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3086,7 +3098,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1012794038}
   - component: {fileID: 1012794037}
-  - component: {fileID: 1012794036}
   - component: {fileID: 1012794035}
   m_Layer: 0
   m_Name: PreviewCam
@@ -3139,14 +3150,6 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
---- !u!81 &1012794036
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012794034}
-  m_Enabled: 1
 --- !u!20 &1012794037
 Camera:
   m_ObjectHideFlags: 0
@@ -3676,6 +3679,10 @@ PrefabInstance:
     - target: {fileID: 4821073973305754829, guid: 5755457c9dd81dc418c62b4d0c4ad619, type: 3}
       propertyPath: m_Name
       value: RandomMap1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4821073973305754829, guid: 5755457c9dd81dc418c62b4d0c4ad619, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5273528933837380814, guid: 5755457c9dd81dc418c62b4d0c4ad619, type: 3}
       propertyPath: m_CastShadows
@@ -4785,6 +4792,7 @@ MonoBehaviour:
   - {fileID: 8637356174404102539, guid: 549cd236de499ab42879a7149cc3197d, type: 3}
   miniMapsParent: {fileID: 156930826}
   miniMapMaterial: {fileID: 2100000, guid: 0a055e9fa3832274b823e1f89649495e, type: 2}
+  previewMinimapPos: {fileID: 1811551301}
 --- !u!1001 &5227189669410580015
 PrefabInstance:
   m_ObjectHideFlags: 0

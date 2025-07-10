@@ -19,14 +19,17 @@ public class MapManager : MonoBehaviour
     [SerializeField] GameObject[] miniMaps;
     [SerializeField] Transform miniMapsParent;
     [SerializeField] Material miniMapMaterial;
+    [SerializeField] Transform previewMinimapPos;
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     MiniMapManager[] miniMapMgrs;
     MiniMapManager minimapMgr;
     List<CreateMiniMap> createMapBtnlist;
+    Queue<GameObject> qPreviewMinimap;
     Direction alreadyConnectedDir;
 
     Material originMat;
+    bool isMapChange = false;
 
     public GameObject newMinimap { get; private set; }
 
@@ -59,12 +62,15 @@ public class MapManager : MonoBehaviour
 
         // ·£´ý ¹Ì´Ï¸Ê º»ºÎ ¹Ø¿¡ ÇÏ³ª ¼³Ä¡
         MakeMiniMapBelowRandomMap(centralMiniMap);
+
+        // ¹Ù²Ü ¹Ì¸®º¸±â ¸Ê ¸¸µé±â
+        MakePreviewRandomMap();
     }
 
     void MakeMiniMapBelowRandomMap(GameObject miniMap)
     {
         // º»ºÎ ¹Þ¾Æ¿À±â
-        //Vector2 minimapPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
+        Vector2 minimapPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
         Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
         Direction connectRoadDir = OppositeDirection(minimapRoadDir);
 
@@ -100,7 +106,7 @@ public class MapManager : MonoBehaviour
         newMinimap.transform.position = miniMap.transform.position + offset;
 
         // Dictionary¿¡ µî·Ï
-        //dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
+        dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
 
         Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
         // »ý¼ºÇÑ ·£´ý¸Ê
@@ -121,10 +127,15 @@ public class MapManager : MonoBehaviour
 
     public void MakeOrMoveRandomMinimap(MinimapSpawnStruct spawnStruct)
     {
-        if(isAlreadyMinimapMade == false)
+        if (isAlreadyMinimapMade == false)
         {
-            CreateRandomMinimap();
+            newMinimap = CreateRandomMinimap(true);
+            minimapMgr = newMinimap.GetComponent<MiniMapManager>();
             isAlreadyMinimapMade = true;
+        }
+        if(newMinimap.activeSelf == false)
+        {
+            newMinimap.SetActive(true);
         }
         newMinimap.transform.position = spawnStruct.spawnPos;
 
@@ -132,15 +143,19 @@ public class MapManager : MonoBehaviour
         UpdateMaterialConnection();
     }
 
-    public void CreateRandomMinimap()
+    public GameObject CreateRandomMinimap(bool isMatChange)
     {
         int random = Random.Range(0, miniMaps.Length);
-        newMinimap = Instantiate(miniMaps[random], miniMapsParent);
+        GameObject rdMinimap = Instantiate(miniMaps[random], miniMapsParent);
 
-        minimapMgr = newMinimap.GetComponent<MiniMapManager>();
-        MinimapNode newMiniNode = minimapMgr.miniMapInfo;
+        MiniMapManager rdMinimapMgr = rdMinimap.GetComponent<MiniMapManager>();
 
-        minimapMgr.ChangeMaterial(miniMapMaterial);
+        if(isMatChange == true)
+        {
+            rdMinimapMgr.ChangeMaterial(miniMapMaterial);
+        }
+
+        return rdMinimap;
     }
 
     void UpdateMaterialConnection()
@@ -272,6 +287,7 @@ public class MapManager : MonoBehaviour
     {
         newMinimap = null;
         isAlreadyMinimapMade = false;
+        isMapChange = false;
     }
 
     public void SetActiveAllCreateMinimapBtn(bool isActive)
@@ -284,6 +300,49 @@ public class MapManager : MonoBehaviour
             }
             btn.gameObject.SetActive(isActive);
         }
+    }
+
+    void MakePreviewRandomMap()
+    {
+        qPreviewMinimap = new Queue<GameObject>();
+        for(int i=0; i<3; i++)
+        {
+            int random = Random.Range(0, miniMaps.Length);
+            GameObject previewMiniObj = Instantiate(miniMaps[random], miniMapsParent);
+            previewMiniObj.transform.position = previewMinimapPos.position;
+            qPreviewMinimap.Enqueue(previewMiniObj);
+            if(i == 0)
+            {
+                continue;
+            }
+            previewMiniObj.SetActive(false);
+        }
+    }
+
+    void ChangePreviewMinimap()
+    {
+        if (qPreviewMinimap.Count > 0)
+        {
+            GameObject newPreviewMap = qPreviewMinimap.Peek();
+            Debug.Log("»õ·Î¿î PreviewMap : " + newPreviewMap);
+            newPreviewMap.SetActive(true);
+        }
+    }
+
+    public void ChangeMinimap()
+    {
+        Destroy(newMinimap);
+        newMinimap = qPreviewMinimap.Dequeue();
+        newMinimap.SetActive(false);
+        Debug.Log("²¨³» ¾´ ÇÁ¸®ºä ¸Ê : " + newMinimap);
+        minimapMgr = newMinimap.GetComponent<MiniMapManager>();
+        minimapMgr.ChangeMaterial(miniMapMaterial);
+        GameObject newPreviewMap = CreateRandomMinimap(false);
+        newPreviewMap.transform.position = previewMinimapPos.position;
+        newPreviewMap.SetActive(false);
+        qPreviewMinimap.Enqueue(newPreviewMap);
+        ChangePreviewMinimap();
+        isMapChange = true;
     }
 
     Direction OppositeDirection(Direction direct)
@@ -319,6 +378,4 @@ public class MapManager : MonoBehaviour
         }
         return Vector3.zero;
     }
-
-
 }
