@@ -53,8 +53,11 @@ public class CameraController : MonoBehaviour
             moveDir += Vector3.back;
         }
 
-        Vector3 move = (new Vector3(h, v, 0) + moveDir) * moveSpeed * Time.deltaTime;
-        transform.Translate(move, Space.World);
+        Vector3 inputDir = (transform.right * h + transform.forward * v).normalized;
+        Vector3 move = (inputDir + moveDir).normalized * moveSpeed * Time.deltaTime;
+
+        move.y = 0;
+        transform.position += move;
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if(scroll != 0)

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class MiniMapManager : MonoBehaviour
@@ -14,6 +15,7 @@ public class MiniMapManager : MonoBehaviour
 
     List<Material> canBuildMats;
     Material originMat;
+
 
     public MinimapNode miniMapInfo { get; private set; }
 
@@ -217,7 +219,12 @@ public class MiniMapManager : MonoBehaviour
                     {
                         tileNodes[z, x].type = node.type;
                         //tileNodes[z, x] = new TileNode(node.type);
-                        if(node.type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
+                        //Vector3 offset = new Vector3(x * 4, pos.y, -z * 4);
+                        //Vector3 worldOrigin = transform.position + new Vector3(-8, 0, 8);
+                        //tileNodes[z, x].worldPosition = worldOrigin + offset;
+                        Vector3 centerOffset = new Vector3((x - indexSize / 2) * 4, pos.y, (indexSize / 2 - z) * 4);
+                        tileNodes[z, x].worldPosition = transform.TransformPoint(centerOffset);
+                        if (node.type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
@@ -227,18 +234,17 @@ public class MiniMapManager : MonoBehaviour
             }
         }
         miniMapInfo.TileNodes = tileNodes;
-        //높이는 나중에
 
         // 길이 있는 면 확인
         miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
 
-        //for (int i = 0; i < indexSize; i++)
-        //{
-        //    for (int j = 0; j < indexSize; j++)
-        //    {
-        //        Debug.Log($"tileNodes[{i},{j}].height = {tileNodes[i, j].height}");
-        //    }
-        //}
+        for (int i = 0; i < indexSize; i++)
+        {
+            for (int j = 0; j < indexSize; j++)
+            {
+                Debug.Log($"tileNodes[{i},{j}].worldPosition = {tileNodes[i, j].worldPosition}");
+            }
+        }
     }
 
     int ExamineHeight(float posY, float scaleY)
@@ -399,5 +405,10 @@ public class MiniMapManager : MonoBehaviour
             MeshRenderer rend = transform.GetChild(i).GetComponent<MeshRenderer>();
             rend.materials = new Material[] { originMat };
         }
+    }
+
+    void SetTileNodeWorldPosition()
+    {
+
     }
 }

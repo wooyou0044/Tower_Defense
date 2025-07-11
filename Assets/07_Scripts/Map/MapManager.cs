@@ -71,51 +71,56 @@ public class MapManager : MonoBehaviour
     {
         // 본부 받아오기
         Vector2 minimapPos = new Vector2(miniMap.transform.position.x, miniMap.transform.position.z);
-        Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
-        Direction connectRoadDir = OppositeDirection(minimapRoadDir);
+        //Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
+        //Direction connectRoadDir = OppositeDirection(minimapRoadDir);
 
-        // 랜덤 미니맵 생성
-        int random = Random.Range(0, miniMaps.Length);
-        newMinimap = Instantiate(miniMaps[random], miniMapsParent);
-        //newMinimap = Instantiate(miniMaps[9]);
-        minimapMgr = newMinimap.GetComponent<MiniMapManager>();
-        MinimapNode newMiniNode = minimapMgr.miniMapInfo;
-
-        // 90도씩 회전하면서 맞닿는 방향 나올때까지 반복
-        int rotateCount = 0;
-        while (rotateCount < (int)Direction.None)
-        {
-            if (minimapMgr.miniMapInfo.RoadEdges.Contains(connectRoadDir))
-            {
-                break;
-            }
-            ExamineRotate(minimapMgr);
-            rotateCount++;
-        }
-
-        if (rotateCount == 4)
-        {
-            Debug.Log("붙일 수 있는 미니맵이 없음");
-            //Destroy(newMiniMap);
-            rotateCount = 0;
-            return;
-        }
-
-        // 미니맵 설치
-        Vector3 offset = GetOffsetDirection(minimapRoadDir, newMiniNode.GetSize());
-        newMinimap.transform.position = miniMap.transform.position + offset;
 
         // Dictionary에 등록
         dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
 
-        Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
-        // 생성한 랜덤맵
-        dicMiniMaps.Add(newMiniMapPos, newMiniNode);
+        foreach (var direction in miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges)
+        {
+            Direction connectRoadDir = OppositeDirection(direction);
 
-        // 미니맵 버튼 생성
-        MakeCreateMinimapButton(newMinimap, connectRoadDir);
+            int random = Random.Range(0, miniMaps.Length);
+            newMinimap = Instantiate(miniMaps[random], miniMapsParent);
+            minimapMgr = newMinimap.GetComponent<MiniMapManager>();
+            MinimapNode newMiniNode = minimapMgr.miniMapInfo;
 
-        newMinimap = null;
+            int rotateCount = 0;
+            while (rotateCount < (int)Direction.None)
+            {
+                if (minimapMgr.miniMapInfo.RoadEdges.Contains(connectRoadDir))
+                {
+                    break;
+                }
+                ExamineRotate(minimapMgr);
+                rotateCount++;
+            }
+
+            if (rotateCount == 4)
+            {
+                Debug.Log("붙일 수 있는 미니맵이 없음");
+                //Destroy(newMiniMap);
+                rotateCount = 0;
+                return;
+            }
+
+            // 미니맵 설치
+            Vector3 offset = GetOffsetDirection(direction, newMiniNode.GetSize());
+            newMinimap.transform.position = miniMap.transform.position + offset;
+
+            Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
+            // 생성한 랜덤맵
+            dicMiniMaps.Add(newMiniMapPos, newMiniNode);
+
+            // 미니맵 버튼 생성
+            MakeCreateMinimapButton(newMinimap, connectRoadDir);
+
+            // 미니맵 WorldPosition 넣기
+
+            newMinimap = null;
+        }
     }
 
     public void ExamineRotate(MiniMapManager mapMgr)
@@ -140,6 +145,9 @@ public class MapManager : MonoBehaviour
         newMinimap.transform.position = spawnStruct.spawnPos;
 
         Direction buttonDir = spawnStruct.connectDireciton;
+
+        // 미니맵 WorldPosition 넣기
+
         UpdateMaterialConnection();
     }
 
@@ -324,7 +332,6 @@ public class MapManager : MonoBehaviour
         if (qPreviewMinimap.Count > 0)
         {
             GameObject newPreviewMap = qPreviewMinimap.Peek();
-            Debug.Log("새로운 PreviewMap : " + newPreviewMap);
             newPreviewMap.SetActive(true);
         }
     }
@@ -334,7 +341,6 @@ public class MapManager : MonoBehaviour
         Destroy(newMinimap);
         newMinimap = qPreviewMinimap.Dequeue();
         newMinimap.SetActive(false);
-        Debug.Log("꺼내 쓴 프리뷰 맵 : " + newMinimap);
         minimapMgr = newMinimap.GetComponent<MiniMapManager>();
         minimapMgr.ChangeMaterial(miniMapMaterial);
         GameObject newPreviewMap = CreateRandomMinimap(false);

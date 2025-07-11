@@ -7,14 +7,14 @@ public class ObjectPool<T> where T : MonoBehaviour
     Queue<T> pool;
     T prefab;
 
-    public ObjectPool(T prefab, int initalSize)
+    public ObjectPool(T prefab, int initalSize, Transform parent)
     {
         this.prefab = prefab;
         pool = new Queue<T>();
 
         for(int i=0; i<initalSize; i++)
         {
-            T instce = Object.Instantiate(prefab);
+            T instce = Object.Instantiate(prefab, parent);
             instce.gameObject.SetActive(false);
             pool.Enqueue(instce);
         }

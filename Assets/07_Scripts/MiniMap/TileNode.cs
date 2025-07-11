@@ -14,6 +14,7 @@ public class TileNode : MonoBehaviour
     public TileType type;
 
     public float height { get; set; }
+    public Vector3 worldPosition { get; set; }
 
     public float gridSize
     {
