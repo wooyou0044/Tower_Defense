@@ -128,6 +128,17 @@ public class MapManager : MonoBehaviour
         Debug.Log("Rotate ÇÔ¼ö È£ÃâµÊ");
         mapMgr.RotateRoadEdgesClockWise();
         mapMgr.gameObject.transform.Rotate(Vector3.up, 90);
+
+        int indexSize = mapMgr.miniMapInfo.TileNodes.GetLength(0);
+        for (int i = 0; i < indexSize; i++)
+        {
+            for (int j = 0; j < indexSize; j++)
+            {
+                float posY = mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y;
+                Vector3 worldPos = mapMgr.SetTileNodeWorldPosition(i, j, mapMgr.transform, posY);
+                mapMgr.miniMapInfo.TileNodes[j, i].worldPosition = worldPos;
+            }
+        }
     }
 
     public void MakeOrMoveRandomMinimap(MinimapSpawnStruct spawnStruct)
