@@ -8,7 +8,6 @@ using UnityEngine;
 public class MiniMapManager : MonoBehaviour
 {
     TileNode[,] tileNodes;
-    bool[] isRoadSide;
 
     int indexSize;
     GameObject makeMiniMapButton;
@@ -42,7 +41,6 @@ public class MiniMapManager : MonoBehaviour
     {
         indexSize = 5;
         tileNodes = new TileNode[indexSize, indexSize];
-        isRoadSide = new bool[4];
 
         for (int i = 0; i < tileNodes.GetLength(0); i++)
         {
@@ -404,9 +402,9 @@ public class MiniMapManager : MonoBehaviour
 
     public Vector3 SetTileNodeWorldPosition(int posX, int posZ, Transform minimapTrans, float roadPosY)
     {
-        Vector3 localOffset = new Vector3((posX - indexSize / 2) * 4, 0, (indexSize / 2 - posZ) * 4);
+        Vector3 localOffset = new Vector3((posX - indexSize / 2) * 4, roadPosY, (indexSize / 2 - posZ) * 4);
         Vector3 worldPos = minimapTrans.TransformPoint(localOffset);
-        worldPos.y = roadPosY;
+        //worldPos.y = roadPosY;
         return worldPos;
     }
 }

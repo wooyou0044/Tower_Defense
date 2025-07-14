@@ -19,10 +19,20 @@ public class TempPathFinding : MonoBehaviour
 
     private void Start()
     {
-        //dicMiniMaps = new Dictionary<Vector2, MinimapNode>();
-        //Vector2 centralMinimapPos = new Vector2(centralMinimap.transform.position.x, centralMinimap.transform.position.z);
-        //dicMiniMaps.Add(centralMinimapPos, centralMinimap.GetComponent<MiniMapManager>().miniMapInfo);
+        dicMiniMaps = new Dictionary<Vector2, MinimapNode>();
 
+        Vector2 centralMinimapPos = new Vector2(centralMinimap.transform.position.x, centralMinimap.transform.position.z);
+        dicMiniMaps.Add(centralMinimapPos, centralMinimap.GetComponent<MiniMapManager>().miniMapInfo);
+
+        Vector2 newMinimapPos = new Vector2(minimapMgr.transform.position.x, minimapMgr.transform.position.z);
+        dicMiniMaps.Add(newMinimapPos, minimapMgr.miniMapInfo);
+
+        //for(int i=0; i<dicMiniMaps.Count; i++)
+        //{
+        //    pathList = new List<Vector3>();
+        //    path = new PathFinding(dicMiniMaps[]);
+        //    pathList = path.FindPath();
+        //}
         pathList = new List<Vector3>();
         path = new PathFinding(minimapMgr.miniMapInfo.TileNodes);
         pathList = path.FindPath();
@@ -48,7 +58,7 @@ public class TempPathFinding : MonoBehaviour
     {
         // 적 생성 -> 길이 뚫려있는 곳에서 나오게 설정해야 함
         enemyObj = Instantiate(enemy, pathList[0], Quaternion.identity);
-        //StartCoroutine(EnemyMoving());
+        StartCoroutine(EnemyMoving());
 
         enemyCurrentPos = enemyObj.transform.position;
 

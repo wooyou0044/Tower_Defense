@@ -11,19 +11,27 @@ public class CreateMiniMap : MonoBehaviour
     Vector2 currentPos;
     bool isMouseOn;
     public bool IsMadeMinimap { get; private set; }
+    public MinimapSpawnStruct ButtonSpawnStruct
+    {
+        get
+        {
+            return miniMapStruct;
+        }
+    }
 
     void Start()
     {
         parentMinimapMgr = transform.parent.GetComponent<MiniMapManager>();
 
+        currentPos = new Vector2(transform.position.x, transform.position.z);
+
         miniMapStruct = new MinimapSpawnStruct
         {
-            spawnPos = transform.position + Vector3.up,
+            miniMapspawnPos = transform.position + Vector3.up,
             connectDireciton = currentDirect,
-            buttonRef = this
+            buttonRef = this,
+            spawnPos = currentPos
         };
-
-        currentPos = new Vector2(transform.position.x, transform.position.z);
     }
 
     private void Update()

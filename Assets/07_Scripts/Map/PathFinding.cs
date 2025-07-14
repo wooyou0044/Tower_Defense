@@ -7,9 +7,15 @@ public class PathFinding
 {
     TileNode[,] allTiles;
 
+    List<Vector3> path;
+
+    Queue<Vector2> qMinimap;
+    HashSet<Vector2> visited;
+    HashSet<MinimapNode> connected;
+
     private void Start()
     {
-        
+        path = new List<Vector3>();
     }
 
     public PathFinding(TileNode[,] tiles)
@@ -19,11 +25,11 @@ public class PathFinding
 
     public List<Vector3> FindPath()
     {
-        List<Vector3> path = new List<Vector3>();
+        path = new List<Vector3>();
 
-        foreach(var tile in allTiles)
+        foreach (var tile in allTiles)
         {
-            if(tile.type == TileType.Buildable)
+            if (tile.type == TileType.Buildable)
             {
                 continue;
             }
@@ -31,5 +37,11 @@ public class PathFinding
         }
 
         return path;
+    }
+
+
+    public void FindShortPath()
+    {
+
     }
 }

@@ -6,9 +6,10 @@ using UnityEngine;
 
 public struct MinimapSpawnStruct
 {
-    public Vector3 spawnPos;
+    public Vector3 miniMapspawnPos;
     public Direction connectDireciton;
     public CreateMiniMap buttonRef;
+    public Vector2 spawnPos;
 }
 
 public class MapManager : MonoBehaviour
@@ -22,14 +23,20 @@ public class MapManager : MonoBehaviour
     [SerializeField] Transform previewMinimapPos;
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
-    MiniMapManager[] miniMapMgrs;
     MiniMapManager minimapMgr;
     List<CreateMiniMap> createMapBtnlist;
     Queue<GameObject> qPreviewMinimap;
     Direction alreadyConnectedDir;
+    PathFinding path;
+    List<MinimapNode> startExamineNodes;
 
     Material originMat;
     bool isMapChange = false;
+    int minimapSize;
+
+    Queue<Vector2> qExamineNode;
+    HashSet<Vector2> visited;
+    List<MinimapNode> connectedMinimaps;
 
     public GameObject newMinimap { get; private set; }
 
@@ -53,6 +60,9 @@ public class MapManager : MonoBehaviour
         isAlreadyMinimapMade = false;
 
         createMapBtnlist = new List<CreateMiniMap>();
+        qExamineNode = new Queue<Vector2>();
+        visited = new HashSet<Vector2>();
+        connectedMinimaps = new List<MinimapNode>();
     }
 
     void Start()
@@ -74,7 +84,6 @@ public class MapManager : MonoBehaviour
         //Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
         //Direction connectRoadDir = OppositeDirection(minimapRoadDir);
 
-
         // Dictionary에 등록
         dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
 
@@ -86,6 +95,11 @@ public class MapManager : MonoBehaviour
             newMinimap = Instantiate(miniMaps[random], miniMapsParent);
             minimapMgr = newMinimap.GetComponent<MiniMapManager>();
             MinimapNode newMiniNode = minimapMgr.miniMapInfo;
+
+            if(minimapSize == 0)
+            {
+                minimapSize = newMiniNode.GetSize();
+            }
 
             int rotateCount = 0;
             while (rotateCount < (int)Direction.None)
@@ -116,8 +130,6 @@ public class MapManager : MonoBehaviour
 
             // 미니맵 버튼 생성
             MakeCreateMinimapButton(newMinimap, connectRoadDir);
-
-            // 미니맵 WorldPosition 넣기
 
             newMinimap = null;
         }
@@ -153,11 +165,9 @@ public class MapManager : MonoBehaviour
         {
             newMinimap.SetActive(true);
         }
-        newMinimap.transform.position = spawnStruct.spawnPos;
+        newMinimap.transform.position = spawnStruct.miniMapspawnPos;
 
         Direction buttonDir = spawnStruct.connectDireciton;
-
-        // 미니맵 WorldPosition 넣기
 
         UpdateMaterialConnection();
     }
@@ -360,6 +370,55 @@ public class MapManager : MonoBehaviour
         qPreviewMinimap.Enqueue(newPreviewMap);
         ChangePreviewMinimap();
         isMapChange = true;
+    }
+
+    void GetStartTileFromDirection()
+    {
+        startExamineNodes = new List<MinimapNode>();
+
+        foreach(var button in createMapBtnlist)
+        {
+            Direction oppBtnDir = OppositeDirection(button.ButtonSpawnStruct.connectDireciton);
+            Vector3 oppBtnMinimapPos = GetOffsetDirection(oppBtnDir, minimapSize);
+            if (dicMiniMaps[new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z)] != null)
+            {
+                startExamineNodes.Add(dicMiniMaps[new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z)]);
+            }
+        }
+        qExamineNode.Clear();
+        visited.Clear();
+        connectedMinimaps.Clear();
+    }
+
+    void CollectConnctedMinimaps(MinimapNode nextNode, Vector2 minimapPos)
+    {
+        qExamineNode.Enqueue(minimapPos);
+        visited.Add(minimapPos);
+
+        while(qExamineNode.Count > 0)
+        {
+            var current = qExamineNode.Dequeue();
+            if (dicMiniMaps.TryGetValue(current, out var currentNode) == false)
+            {
+                continue;
+            }
+            connectedMinimaps.Add(currentNode);
+
+            foreach(var dir in currentNode.RoadEdges)
+            {
+                Vector3 next = GetOffsetDirection(dir, minimapSize);
+
+                if(visited.Contains(new Vector2(next.x, next.z)))
+                {
+                    continue;
+                }
+                if(dicMiniMaps.TryGetValue(next, out var neighbor) && neighbor.RoadEdges.Contains(OppositeDirection(dir)))
+                {
+                    qExamineNode.Enqueue(next);
+                    visited.Add(next);
+                }
+            }
+        }
     }
 
     Direction OppositeDirection(Direction direct)
