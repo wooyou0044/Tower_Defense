@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public struct MinimapSpawnStruct
@@ -28,15 +29,10 @@ public class MapManager : MonoBehaviour
     Queue<GameObject> qPreviewMinimap;
     Direction alreadyConnectedDir;
     PathFinding path;
-    List<MinimapNode> startExamineNodes;
 
     Material originMat;
     bool isMapChange = false;
     int minimapSize;
-
-    Queue<Vector2> qExamineNode;
-    HashSet<Vector2> visited;
-    List<MinimapNode> connectedMinimaps;
 
     public GameObject newMinimap { get; private set; }
 
@@ -60,9 +56,6 @@ public class MapManager : MonoBehaviour
         isAlreadyMinimapMade = false;
 
         createMapBtnlist = new List<CreateMiniMap>();
-        qExamineNode = new Queue<Vector2>();
-        visited = new HashSet<Vector2>();
-        connectedMinimaps = new List<MinimapNode>();
     }
 
     void Start()
@@ -372,53 +365,109 @@ public class MapManager : MonoBehaviour
         isMapChange = true;
     }
 
-    void GetStartTileFromDirection()
+    public void FindEnemyPath()
     {
-        startExamineNodes = new List<MinimapNode>();
+        HashSet<Vector2> startNodesPos = new HashSet<Vector2>();
+        MiniMapManager centralMapMgr = centralMiniMap.GetComponent<MiniMapManager>();
 
-        foreach(var button in createMapBtnlist)
+        foreach (var button in createMapBtnlist)
         {
             Direction oppBtnDir = OppositeDirection(button.ButtonSpawnStruct.connectDireciton);
-            Vector3 oppBtnMinimapPos = GetOffsetDirection(oppBtnDir, minimapSize);
-            if (dicMiniMaps[new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z)] != null)
+            Vector3 oppBtnMinimapPos = button.transform.position + GetOffsetDirection(oppBtnDir, minimapSize);
+            Vector2 minimapPos = new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z);
+
+            if (dicMiniMaps.TryGetValue(minimapPos, out var startNode) == false || startNodesPos.Contains(minimapPos))
             {
-                startExamineNodes.Add(dicMiniMaps[new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z)]);
+                continue;
+            }
+
+            startNodesPos.Add(minimapPos);
+
+            List<Vector3> enemySpawnPoints = new List<Vector3>();
+            foreach (var dir in startNode.RoadEdges)
+            {
+                Vector3 offset = GetOffsetDirection(dir, startNode.GetSize());
+                Vector2 neighborMinimapPos = minimapPos + new Vector2(offset.x, offset.z);
+
+                if (dicMiniMaps.ContainsKey(neighborMinimapPos) == false)
+                {
+                    Vector3 spawnPos = startNode.GetWorldPositionCenter() + GetOffsetDirection(dir, startNode.GetSize() / 2);
+                    enemySpawnPoints.Add(spawnPos);
+                }
+            }
+
+            List<MinimapNode> connectedMinimaps = CollectConnctedMinimaps(minimapPos);
+
+            if (connectedMinimaps.Contains(centralMapMgr.miniMapInfo) == false)
+            {
+                continue;
+            }
+
+            List<Vector3> pathCandidates = new List<Vector3>();
+            foreach (var minimap in connectedMinimaps)
+            {
+                pathCandidates.AddRange(minimap.GetRoadWorldPositions());
+            }
+
+            foreach (var enemySpawn in enemySpawnPoints)
+            {
+                Vector3 goal = centralMapMgr.miniMapInfo.GetWorldPositionCenter();
+                List<Vector3> path = AStarPathFinding(enemySpawn, goal, pathCandidates);
+
+                // 몬스터 생성 및 경로 할당
             }
         }
-        qExamineNode.Clear();
-        visited.Clear();
-        connectedMinimaps.Clear();
     }
 
-    void CollectConnctedMinimaps(MinimapNode nextNode, Vector2 minimapPos)
+    List<MinimapNode> CollectConnctedMinimaps(Vector2 startMinimapPos)
     {
-        qExamineNode.Enqueue(minimapPos);
-        visited.Add(minimapPos);
+        Queue<Vector2> queue = new Queue<Vector2>();
+        HashSet<Vector2> visited = new HashSet<Vector2>();
+        List<MinimapNode> connectedMinimaps = new List<MinimapNode>();
 
-        while(qExamineNode.Count > 0)
+        var centralMinimapNode = dicMiniMaps.First().Value;
+
+        queue.Enqueue(startMinimapPos);
+        visited.Add(startMinimapPos);
+
+        while(queue.Count > 0)
         {
-            var current = qExamineNode.Dequeue();
-            if (dicMiniMaps.TryGetValue(current, out var currentNode) == false)
+            var currentPos = queue.Dequeue();
+
+            if(dicMiniMaps.TryGetValue(currentPos, out var currentNode) == false)
             {
                 continue;
             }
             connectedMinimaps.Add(currentNode);
 
+            if(currentNode == centralMinimapNode)
+            {
+                break;
+            }
+
             foreach(var dir in currentNode.RoadEdges)
             {
-                Vector3 next = GetOffsetDirection(dir, minimapSize);
+                Vector3 offset = GetOffsetDirection(dir, currentNode.GetSize());
+                Vector2 neighborPos = currentPos + new Vector2(offset.x, offset.z);
 
-                if(visited.Contains(new Vector2(next.x, next.z)))
+                if(visited.Contains(neighborPos))
                 {
                     continue;
                 }
-                if(dicMiniMaps.TryGetValue(next, out var neighbor) && neighbor.RoadEdges.Contains(OppositeDirection(dir)))
+
+                if(dicMiniMaps.TryGetValue(neighborPos, out var neighbor) && neighbor.RoadEdges.Contains(OppositeDirection(dir)))
                 {
-                    qExamineNode.Enqueue(next);
-                    visited.Add(next);
+                    queue.Enqueue(neighborPos);
+                    visited.Add(neighborPos);
                 }
             }
         }
+        return connectedMinimaps;
+    }
+
+    List<Vector3> AStarPathFinding(Vector3 enemySpawnPos, Vector3 goalPos, List<Vector3> pathCandidatesPos)
+    {
+
     }
 
     Direction OppositeDirection(Direction direct)
@@ -439,8 +488,6 @@ public class MapManager : MonoBehaviour
 
     Vector3 GetOffsetDirection(Direction direct, int mapSize)
     {
-        float tileSize = 4f;
-
         switch(direct)
         {
             case Direction.Top:

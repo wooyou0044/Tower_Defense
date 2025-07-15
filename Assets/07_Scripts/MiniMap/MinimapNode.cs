@@ -43,4 +43,29 @@ public class MinimapNode
         size *= tileNodes.GetLength(0);
         return size;
     }
+
+    public List<Vector3> GetRoadWorldPositions()
+    {
+        List<Vector3> roadWorldPos = new List<Vector3>();
+        for (int i = 0; i < tileNodes.GetLength(0); i++)
+        {
+            for (int j = 0; j < tileNodes.GetLength(1); j++)
+            {
+                if (tileNodes[i, j].type == TileType.Road)
+                {
+                    roadWorldPos.Add(tileNodes[i, j].worldPosition);
+                }
+            }
+        }
+        return roadWorldPos;
+    }
+
+    public Vector3 GetWorldPositionCenter()
+    {
+        int width = tileNodes.GetLength(0) - 1;
+        int height = tileNodes.GetLength(1) - 1;
+
+        TileNode centerTileNode = tileNodes[width / 2, height / 2];
+        return centerTileNode.worldPosition;
+    }
 }
