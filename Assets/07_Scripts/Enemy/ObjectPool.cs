@@ -22,6 +22,7 @@ public class ObjectPool<T> where T : MonoBehaviour
 
     public T GetObject()
     {
+        Debug.Log("Ç® °³¼ö : " + pool.Count);
         if (pool.Count > 0)
         {
             T obj = pool.Dequeue();

@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    EnemyState currentState;
+    [SerializeField] float moveSpeed = 3f;
 
+    EnemyState currentState;
+    public List<Vector3> movePath { get; set; }
+    public bool isMoving { get; set; }
+    public int currentIndex { get; set; }
     float currentHP;
 
     public Animator animator { get; set; }
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     void Start()
     {
@@ -17,6 +26,13 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
+        if (isMoving == false || movePath == null || currentIndex >= movePath.Count)
+        {
+            Debug.Log("isMoving = " + isMoving);
+            Debug.Log("movePath = " + movePath.Count);
+            Debug.Log("currentIndex = " + currentIndex);
+            return;
+        }
         currentState.UpdateState(this);
     }
 
@@ -39,6 +55,32 @@ public class EnemyController : MonoBehaviour
         {
             gameObject.SetActive(false);
             GameManager.Instance.ReturnEnemy(this);
+        }
+    }
+
+    public void SetPath(List<Vector3> path)
+    {
+        movePath = path;
+        currentIndex = 0;
+        isMoving = true;
+
+        ChangeState(new MoveState());
+    }
+
+    public void MovePath()
+    {
+        Vector3 targetPos = movePath[currentIndex];
+        Debug.Log("타겟 위치 : " + targetPos);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+        Debug.Log("현재 위치 : " + transform.position);
+        if (Vector3.Distance(transform.position, targetPos) < 0.1f)
+        {
+            currentIndex++;
+
+            if (currentIndex >= movePath.Count)
+            {
+                isMoving = false;
+            }
         }
     }
 }

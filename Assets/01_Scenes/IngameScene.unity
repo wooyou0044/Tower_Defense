@@ -1349,6 +1349,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mummy_Mon (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7106108068089380290, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7106108068089733602, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 500
@@ -1429,6 +1433,10 @@ PrefabInstance:
     - target: {fileID: 3391172485395699598, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
       propertyPath: m_Name
       value: Mummy_Mon
+      objectReference: {fileID: 0}
+    - target: {fileID: 7106108068089380290, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7106108068089733602, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
       propertyPath: m_LocalScale.x
@@ -3314,6 +3322,7 @@ MonoBehaviour:
   enemy: {fileID: 7106108068089380290, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
   enemyPoolSize: 30
   enemyInstParent: {fileID: 1623665375}
+  enemySpawnCount: 1
 --- !u!1001 &1208567351
 PrefabInstance:
   m_ObjectHideFlags: 0

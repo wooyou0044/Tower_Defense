@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public struct MinimapSpawnStruct
@@ -45,6 +43,11 @@ public class MapManager : MonoBehaviour
             return _instance;
         }
     }
+
+    public List<CreateMiniMap> minimapButtonList
+    {
+        get { return createMapBtnlist; }
+    }    
 
     private void Awake()
     {
@@ -365,58 +368,61 @@ public class MapManager : MonoBehaviour
         isMapChange = true;
     }
 
-    public void FindEnemyPath()
+    public List<Vector3> FindEnemyPath(CreateMiniMap spawnButton)
     {
-        HashSet<Vector2> startNodesPos = new HashSet<Vector2>();
-        MiniMapManager centralMapMgr = centralMiniMap.GetComponent<MiniMapManager>();
+        Direction oppBtnDir = OppositeDirection(spawnButton.ButtonSpawnStruct.connectDireciton);
+        Vector3 oppBtnMinimapPos = spawnButton.transform.position + GetOffsetDirection(oppBtnDir, minimapSize);
+        Vector2 minimapPos = new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z);
 
-        foreach (var button in createMapBtnlist)
+        if (dicMiniMaps.TryGetValue(minimapPos, out var startNode) == false)
         {
-            Direction oppBtnDir = OppositeDirection(button.ButtonSpawnStruct.connectDireciton);
-            Vector3 oppBtnMinimapPos = button.transform.position + GetOffsetDirection(oppBtnDir, minimapSize);
-            Vector2 minimapPos = new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z);
+            Debug.Log("미니맵 없음");
+            return null;
+        }
 
-            if (dicMiniMaps.TryGetValue(minimapPos, out var startNode) == false || startNodesPos.Contains(minimapPos))
+        //startNodesPos.Add(minimapPos);
+
+        List<Vector3> enemySpawnPoints = new List<Vector3>();
+
+        foreach (var dir in startNode.RoadEdges)
+        {
+            Vector3 offset = GetOffsetDirection(dir, startNode.GetSize());
+            Vector2 neighborMinimapPos = minimapPos + new Vector2(offset.x, offset.z);
+
+            if (dicMiniMaps.ContainsKey(neighborMinimapPos) == false)
             {
-                continue;
-            }
-
-            startNodesPos.Add(minimapPos);
-
-            List<Vector3> enemySpawnPoints = new List<Vector3>();
-            foreach (var dir in startNode.RoadEdges)
-            {
-                Vector3 offset = GetOffsetDirection(dir, startNode.GetSize());
-                Vector2 neighborMinimapPos = minimapPos + new Vector2(offset.x, offset.z);
-
-                if (dicMiniMaps.ContainsKey(neighborMinimapPos) == false)
-                {
-                    Vector3 spawnPos = startNode.GetWorldPositionCenter() + GetOffsetDirection(dir, startNode.GetSize() / 2);
-                    enemySpawnPoints.Add(spawnPos);
-                }
-            }
-
-            List<MinimapNode> connectedMinimaps = CollectConnctedMinimaps(minimapPos);
-
-            if (connectedMinimaps.Contains(centralMapMgr.miniMapInfo) == false)
-            {
-                continue;
-            }
-
-            List<Vector3> pathCandidates = new List<Vector3>();
-            foreach (var minimap in connectedMinimaps)
-            {
-                pathCandidates.AddRange(minimap.GetRoadWorldPositions());
-            }
-
-            foreach (var enemySpawn in enemySpawnPoints)
-            {
-                Vector3 goal = centralMapMgr.miniMapInfo.GetWorldPositionCenter();
-                List<Vector3> path = AStarPathFinding(enemySpawn, goal, pathCandidates);
-
-                // 몬스터 생성 및 경로 할당
+                Vector3 spawnPos = startNode.GetWorldPositionCenter() + GetOffsetDirection(dir, startNode.GetSize() / 2);
+                enemySpawnPoints.Add(spawnPos);
             }
         }
+
+        List<MinimapNode> connectedMinimaps = CollectConnctedMinimaps(minimapPos);
+        MiniMapManager centralMapMgr = centralMiniMap.GetComponent<MiniMapManager>();
+
+        if (connectedMinimaps.Contains(centralMapMgr.miniMapInfo) == false)
+        {
+            Debug.Log("연결된 미니맵에 본부가 없음");
+            return null;
+        }
+
+        List<Vector3> pathCandidates = new List<Vector3>();
+        foreach (var minimap in connectedMinimaps)
+        {
+            pathCandidates.AddRange(minimap.GetRoadWorldPositions());
+        }
+        Debug.Log("pathCandidates 개수 : " + pathCandidates.Count);
+
+        Vector3 goal = centralMapMgr.miniMapInfo.GetWorldPositionCenter();
+        if(enemySpawnPoints.Count == 0)
+        {
+            Debug.Log("적 생성 위치가 없음");
+            return null;
+        }
+
+        List<Vector3> path = AStarPathFinding(enemySpawnPoints[0], goal, pathCandidates);
+        Debug.Log("MapManager path 개수 : " + path.Count);
+
+        return path;
     }
 
     List<MinimapNode> CollectConnctedMinimaps(Vector2 startMinimapPos)
@@ -467,7 +473,102 @@ public class MapManager : MonoBehaviour
 
     List<Vector3> AStarPathFinding(Vector3 enemySpawnPos, Vector3 goalPos, List<Vector3> pathCandidatesPos)
     {
+        Dictionary<Vector3, AStarNode> dicNodeMap = new Dictionary<Vector3, AStarNode>();
+        foreach(var pos in pathCandidatesPos)
+        {
+            dicNodeMap[pos] = new AStarNode(pos);
+        }
+        AStarNode startNode = GetCloseOpenNode(enemySpawnPos, dicNodeMap);
+        AStarNode endNode = GetCloseOpenNode(goalPos, dicNodeMap);
 
+        startNode.gCost = 0;
+        startNode.hCost = Heurisitic(startNode.worldPosition, endNode.worldPosition);
+
+        List<AStarNode> openList = new List<AStarNode>();
+        HashSet<AStarNode> closedList = new HashSet<AStarNode>();
+
+        openList.Add(startNode);
+        
+        while(openList.Count > 0)
+        {
+            openList.Sort((a, b) => a.fCost.CompareTo(b.fCost));
+
+            AStarNode currentNode = openList[0];
+            if(currentNode == endNode)
+            {
+                List<Vector3> path = new List<Vector3>();
+                AStarNode current = endNode;
+                while(current != null)
+                {
+                    path.Add(current.worldPosition);
+                    current = current.parent;
+                }
+                path.Reverse();
+
+                return path;
+            }
+
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            List<AStarNode> neighborNodeList = GetNeighbors(currentNode, dicNodeMap);
+
+            foreach(var neighbor in neighborNodeList)
+            {
+                if(closedList.Contains(neighbor))
+                {
+                    continue;
+                }
+
+                float tentativeG = currentNode.gCost + Vector3.Distance(currentNode.worldPosition, neighbor.worldPosition);
+
+                if(tentativeG < neighbor.gCost)
+                {
+                    neighbor.parent = currentNode;
+                    neighbor.gCost = tentativeG;
+                    neighbor.gCost = Heurisitic(neighbor.worldPosition, endNode.worldPosition);
+
+                    if(openList.Contains(neighbor))
+                    {
+                        openList.Add(neighbor);
+                    }
+                }
+            }
+        }
+        return new List<Vector3>();
+    }
+
+    AStarNode GetCloseOpenNode(Vector3 target, Dictionary<Vector3, AStarNode> dicMap)
+    {
+        return dicMap.Values.OrderBy(n => Vector3.Distance(n.worldPosition, target)).First();
+    }
+
+    float Heurisitic(Vector3 startPos, Vector3 endPos)
+    {
+        return Mathf.Abs(startPos.x - endPos.x) - Mathf.Abs(startPos.z - endPos.z);
+    }
+
+    List<AStarNode> GetNeighbors(AStarNode node, Dictionary<Vector3, AStarNode> dicMap)
+    {
+        float gridSize = 4f;
+        List<AStarNode> neighbors = new List<AStarNode>();
+        Vector3[] directions =
+        {
+            new Vector3(gridSize, 0, 0),
+            new Vector3(-gridSize, 0, 0),
+            new Vector3(0, 0, gridSize),
+            new Vector3(0, 0, -gridSize)
+        };
+
+        foreach(var dir in directions)
+        {
+            Vector3 neighboarPos = node.worldPosition + dir;
+            if(dicMap.TryGetValue(neighboarPos, out var neighbor))
+            {
+                neighbors.Add(neighbor);
+            }
+        }
+        return neighbors;
     }
 
     Direction OppositeDirection(Direction direct)
