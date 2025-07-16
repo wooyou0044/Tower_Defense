@@ -25,6 +25,8 @@ public class MiniMapManager : MonoBehaviour
 
         // 각각의 노드가 무슨 타입인지 나누기
         DivideMinimapNode();
+
+        //Debug.Log(miniMapInfo.GetWorldPositionCenter());
     }
 
     void Start()

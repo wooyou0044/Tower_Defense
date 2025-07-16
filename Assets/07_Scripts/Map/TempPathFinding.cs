@@ -97,5 +97,7 @@ public class TempPathFinding : MonoBehaviour
                 mapMgr.miniMapInfo.TileNodes[j, i].worldPosition = worldPos;
             }
         }
+
+        Debug.Log("미니맵의 중간 지점 : " + mapMgr.miniMapInfo.GetWorldPositionCenter());
     }
 }

@@ -31,6 +31,7 @@ public class MapManager : MonoBehaviour
     Material originMat;
     bool isMapChange = false;
     int minimapSize;
+    float roadPosY;
 
     public GameObject newMinimap { get; private set; }
 
@@ -104,7 +105,9 @@ public class MapManager : MonoBehaviour
                 {
                     break;
                 }
-                ExamineRotate(minimapMgr);
+                Debug.Log("반복");
+                minimapMgr.RotateRoadEdgesClockWise();
+                minimapMgr.gameObject.transform.Rotate(Vector3.up, 90);
                 rotateCount++;
             }
 
@@ -124,6 +127,9 @@ public class MapManager : MonoBehaviour
             // 생성한 랜덤맵
             dicMiniMaps.Add(newMiniMapPos, newMiniNode);
 
+            // 회전하면 판정
+            ResetMinimapWorldPosition(minimapMgr);
+
             // 미니맵 버튼 생성
             MakeCreateMinimapButton(newMinimap, connectRoadDir);
 
@@ -136,17 +142,6 @@ public class MapManager : MonoBehaviour
         Debug.Log("Rotate 함수 호출됨");
         mapMgr.RotateRoadEdgesClockWise();
         mapMgr.gameObject.transform.Rotate(Vector3.up, 90);
-
-        int indexSize = mapMgr.miniMapInfo.TileNodes.GetLength(0);
-        for (int i = 0; i < indexSize; i++)
-        {
-            for (int j = 0; j < indexSize; j++)
-            {
-                float posY = mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y;
-                Vector3 worldPos = mapMgr.SetTileNodeWorldPosition(i, j, mapMgr.transform, posY);
-                mapMgr.miniMapInfo.TileNodes[j, i].worldPosition = worldPos;
-            }
-        }
     }
 
     public void MakeOrMoveRandomMinimap(MinimapSpawnStruct spawnStruct)
@@ -292,6 +287,9 @@ public class MapManager : MonoBehaviour
         Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
         MinimapNode node = newMinimap.GetComponent<MiniMapManager>().miniMapInfo;
 
+        MiniMapManager mapMgr = newMinimap.GetComponent<MiniMapManager>();
+        ResetMinimapWorldPosition(mapMgr);
+
         // 생성한 랜덤맵
         dicMiniMaps.Add(newMiniMapPos, node);
         Debug.Log("Dictionary 개수 : " + dicMiniMaps.Count);
@@ -306,6 +304,22 @@ public class MapManager : MonoBehaviour
 
         // 임시로 테스트
         SetActiveAllCreateMinimapBtn(true);
+    }
+
+    void ResetMinimapWorldPosition(MiniMapManager mapMgr)
+    {
+        int indexSize = mapMgr.miniMapInfo.TileNodes.GetLength(0);
+        for (int i = 0; i < indexSize; i++)
+        {
+            for (int j = 0; j < indexSize; j++)
+            {
+                float posY = mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y;
+                Vector3 worldPos = mapMgr.SetTileNodeWorldPosition(i, j, mapMgr.transform, posY);
+                mapMgr.miniMapInfo.TileNodes[j, i].worldPosition = worldPos;
+                Debug.Log("높이 : " + mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y);
+            }
+        }
+        Debug.Log("Center : " + mapMgr.miniMapInfo.GetWorldPositionCenter());
     }
 
     void ResetNewMinimap()
@@ -392,6 +406,7 @@ public class MapManager : MonoBehaviour
             if (dicMiniMaps.ContainsKey(neighborMinimapPos) == false)
             {
                 Vector3 spawnPos = startNode.GetWorldPositionCenter() + GetOffsetDirection(dir, startNode.GetSize() / 2);
+                Debug.Log("spawnPos : " + spawnPos);
                 enemySpawnPoints.Add(spawnPos);
             }
         }

@@ -64,7 +64,7 @@ public class MinimapNode
     {
         int width = tileNodes.GetLength(0) - 1;
         int height = tileNodes.GetLength(1) - 1;
-
+            
         TileNode centerTileNode = tileNodes[width / 2, height / 2];
         return centerTileNode.worldPosition;
     }
