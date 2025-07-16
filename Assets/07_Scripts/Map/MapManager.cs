@@ -316,6 +316,10 @@ public class MapManager : MonoBehaviour
                 float posY = mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y;
                 Vector3 worldPos = mapMgr.SetTileNodeWorldPosition(i, j, mapMgr.transform, posY);
                 mapMgr.miniMapInfo.TileNodes[j, i].worldPosition = worldPos;
+                if(roadPosY == 0 && mapMgr.miniMapInfo.TileNodes[j,i].type == TileType.Road)
+                {
+                    roadPosY = mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y;
+                }
                 Debug.Log("≥Ù¿Ã : " + mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y);
             }
         }
@@ -406,6 +410,7 @@ public class MapManager : MonoBehaviour
             if (dicMiniMaps.ContainsKey(neighborMinimapPos) == false)
             {
                 Vector3 spawnPos = startNode.GetWorldPositionCenter() + GetOffsetDirection(dir, startNode.GetSize() / 2);
+                spawnPos.y = roadPosY;
                 Debug.Log("spawnPos : " + spawnPos);
                 enemySpawnPoints.Add(spawnPos);
             }
