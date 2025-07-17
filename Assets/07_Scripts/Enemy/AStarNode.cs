@@ -6,7 +6,7 @@ public class AStarNode
 {
     public Vector3 worldPosition { get; set; }
     public AStarNode parent { get; set; }
-    public float gCost { get; set; }
+    public float gCost = float.MaxValue;
     public float hCost { get; set; }
 
     public float fCost

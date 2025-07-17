@@ -33,6 +33,11 @@ public class EnemyController : MonoBehaviour
             Debug.Log("currentIndex = " + currentIndex);
             return;
         }
+        if(currentState == null)
+        {
+            Debug.Log("currentState가 null입니다!");
+        }
+        Debug.Log("EnemyController의 Update가 호출됨");
         currentState.UpdateState(this);
     }
 
@@ -60,6 +65,7 @@ public class EnemyController : MonoBehaviour
 
     public void SetPath(List<Vector3> path)
     {
+        Debug.Log("SetPath 호출됨! 받은 path.Count : " + path.Count);
         movePath = path;
         currentIndex = 0;
         isMoving = true;
@@ -80,6 +86,7 @@ public class EnemyController : MonoBehaviour
             if (currentIndex >= movePath.Count)
             {
                 isMoving = false;
+                Debug.Log("isMoving == false");
             }
         }
     }

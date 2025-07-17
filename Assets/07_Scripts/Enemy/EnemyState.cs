@@ -19,6 +19,7 @@ public class IdleState : EnemyState
 
     public override void UpdateState(EnemyController enemy)
     {
+        Debug.Log("Idle");
     }
 
     public override void FixedUpdateState(EnemyController enemy)

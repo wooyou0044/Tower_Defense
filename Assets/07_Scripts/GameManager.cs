@@ -43,15 +43,14 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("스페이스 눌림");
         //적들이 움직이는 중이면 Space도 막고 버튼도 집어넣어야 함
-        Debug.Log("미니맵 버튼 개수 : " + MapManager.Instance.minimapButtonList.Count);
-        foreach(var button in MapManager.Instance.minimapButtonList)
+        List<EnemyPathInfo> enemyPaths = MapManager.Instance.FindEnemyPath();
+        foreach(var path in enemyPaths)
         {
-            Debug.Log("버튼");
-            List<Vector3> path = MapManager.Instance.FindEnemyPath(button);
             for(int i=0; i< enemySpawnCount; i++)
             {
                 EnemyController enemyCtrl = enemyPool.GetObject();
-                enemyCtrl.SetPath(path);
+                enemyCtrl.transform.position = path.spawnPos;
+                enemyCtrl.SetPath(path.movePath);
             }
         }
     }
