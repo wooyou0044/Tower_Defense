@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("스페이스 눌림");
         //적들이 움직이는 중이면 Space도 막고 버튼도 집어넣어야 함
-        List<EnemyPathInfo> enemyPaths = MapManager.Instance.FindEnemyPath();
+        List<EnemyPathInfo> enemyPaths = MapManager.Instance.EnemyPathInfos;
         foreach(var path in enemyPaths)
         {
             for(int i=0; i< enemySpawnCount; i++)

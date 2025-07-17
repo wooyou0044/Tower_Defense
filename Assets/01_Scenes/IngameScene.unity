@@ -1670,7 +1670,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 518250080}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1120532338}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: SendWave
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &519708278
 GameObject:
   m_ObjectHideFlags: 0
@@ -4697,6 +4709,22 @@ PrefabInstance:
     - target: {fileID: 962505566227002899, guid: 37da2881295b7dc43bf8ce5582b6f63f, type: 3}
       propertyPath: m_Name
       value: Base
+      objectReference: {fileID: 0}
+    - target: {fileID: 1074980294144883882, guid: 37da2881295b7dc43bf8ce5582b6f63f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3738099911588760473, guid: 37da2881295b7dc43bf8ce5582b6f63f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4288659567879926061, guid: 37da2881295b7dc43bf8ce5582b6f63f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616983975269836977, guid: 37da2881295b7dc43bf8ce5582b6f63f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8221291294252045570, guid: 37da2881295b7dc43bf8ce5582b6f63f, type: 3}
       propertyPath: m_LocalPosition.x

@@ -31,13 +31,11 @@ public class MoveState : EnemyState
 {
     public override void EnterState(EnemyController enemy)
     {
-        Debug.Log("들어왔음! 움직여야 함");
         enemy.animator.SetBool("isMove", true);
     }
 
     public override void UpdateState(EnemyController enemy)
     {
-        Debug.Log("움직이고 있음");
         enemy.MovePath();
     }
 

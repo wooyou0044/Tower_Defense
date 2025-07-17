@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4936910241425109640}
   - component: {fileID: 3265450906555336385}
   - component: {fileID: 4288659567879926061}
+  - component: {fileID: 4598124119662995982}
   m_Layer: 0
   m_Name: t1 (1)
   m_TagString: Untagged
@@ -103,8 +104,20 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.9325767, y: 3.01, z: 3.3280325}
-  m_Center: {x: 0.000030517578, y: -0.56, z: 0.0000013113026}
+  m_Size: {x: 3.9325767, y: 2.56, z: 3.3280325}
+  m_Center: {x: 0.000030517578, y: -2.04, z: 0.0000013113026}
+--- !u!114 &4598124119662995982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 588454108976090400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316dcd177e09e4840af1dd94966b2999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &962505566227002899
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,6 +240,7 @@ GameObject:
   - component: {fileID: 8194658099342547687}
   - component: {fileID: 8510032207901944499}
   - component: {fileID: 4616983975269836977}
+  - component: {fileID: 1546972699097688316}
   m_Layer: 0
   m_Name: t1 (3)
   m_TagString: Untagged
@@ -318,8 +332,20 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.9325767, y: 3.01, z: 3.3280325}
-  m_Center: {x: 0.000030517578, y: -0.56, z: 0.0000013113026}
+  m_Size: {x: 3.9325767, y: 2.56, z: 3.3280325}
+  m_Center: {x: 0.000030517578, y: -1.74, z: 0.0000013113026}
+--- !u!114 &1546972699097688316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2932947824270118537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316dcd177e09e4840af1dd94966b2999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3484001637401674532
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,6 +463,7 @@ GameObject:
   - component: {fileID: 8206551396497143762}
   - component: {fileID: 5157720014963751254}
   - component: {fileID: 3738099911588760473}
+  - component: {fileID: 5435265831500662496}
   m_Layer: 0
   m_Name: t1 (2)
   m_TagString: Untagged
@@ -528,8 +555,20 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.9325767, y: 3.01, z: 3.3280325}
-  m_Center: {x: 0.000030517578, y: -0.56, z: 0.0000013113026}
+  m_Size: {x: 3.9325767, y: 2.56, z: 3.3280325}
+  m_Center: {x: 0.000030517578, y: 2.64, z: 0.0000013113026}
+--- !u!114 &5435265831500662496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492225686120586544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316dcd177e09e4840af1dd94966b2999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5068939922886956935
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,6 +581,7 @@ GameObject:
   - component: {fileID: 1945696462380628311}
   - component: {fileID: 7277847069336827432}
   - component: {fileID: 1074980294144883882}
+  - component: {fileID: 1185055441232559799}
   m_Layer: 0
   m_Name: t1
   m_TagString: Untagged
@@ -633,5 +673,17 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.9325767, y: 3.01, z: 3.3280325}
-  m_Center: {x: 0.000030517578, y: -0.56, z: 0.0000013113026}
+  m_Size: {x: 3.9325767, y: 2.56, z: 3.3280325}
+  m_Center: {x: 0.000030517578, y: 2.12, z: 0.0000013113026}
+--- !u!114 &1185055441232559799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5068939922886956935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316dcd177e09e4840af1dd94966b2999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

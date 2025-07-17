@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class EnemyPathInfo
 {
-    public Vector3 spawnPos { get; private set; }
-    public List<Vector3> movePath { get; private set; }
+    public Vector3 spawnPos { get; set; }
+    public Vector3 goalPos { get; set; }
+    public List<Vector3> movePath { get; set; }
 
-    public EnemyPathInfo(Vector3 pos, List<Vector3> path)
+    public EnemyPathInfo(Vector3 pos, Vector3 goal, List<Vector3> path)
     {
         spawnPos = pos;
+        goalPos = goal;
         movePath = path;
     }
 }
