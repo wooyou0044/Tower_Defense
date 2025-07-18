@@ -15,7 +15,6 @@ public class MinimapNode
 {
     private TileNode[,] tileNodes;
     private HashSet<Direction> roadEdges;
-    private int mapSize;
     private Vector3 currentPos;
 
     public TileNode[,] TileNodes
