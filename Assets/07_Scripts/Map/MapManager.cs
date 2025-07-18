@@ -24,8 +24,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] Transform previewMinimapPos;
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
-    List<EnemyPathInfo> totalEnemyPathList;
-    List<Vector3> totalMapsPosList;
+    Dictionary<Vector3, EnemyPathInfo> dicTotalEnemyPath;
     MiniMapManager minimapMgr;
     List<CreateMiniMap> createMapBtnlist;
     Queue<GameObject> qPreviewMinimap;
@@ -48,9 +47,9 @@ public class MapManager : MonoBehaviour
             return _instance;
         }
     }
-    public List<EnemyPathInfo> EnemyPathInfos
+    public Dictionary<Vector3, EnemyPathInfo> EnemyPathInfos
     {
-        get { return totalEnemyPathList; }
+        get { return dicTotalEnemyPath; }
     }
 
     private void Awake()
@@ -69,8 +68,7 @@ public class MapManager : MonoBehaviour
     {
         // 본부랑 게임 시작할때 생성할 랜덤 미니맵 Dictionary에 넣기
         dicMiniMaps = new Dictionary<Vector2, MinimapNode>();
-        totalEnemyPathList = new List<EnemyPathInfo>();
-        totalMapsPosList = new List<Vector3>();
+        dicTotalEnemyPath = new Dictionary<Vector3, EnemyPathInfo>();
 
         // 랜덤 미니맵 본부 밑에 하나 설치
         MakeMiniMapBelowRandomMap(centralMiniMap);
@@ -143,8 +141,8 @@ public class MapManager : MonoBehaviour
             newMinimap = null;
         }
 
-        totalEnemyPathList = FindEnemyPath();
-        Debug.Log("totalEnemyPathList.Count : " + totalEnemyPathList.Count);
+        dicTotalEnemyPath = FindEnemyPath();
+        Debug.Log("totalEnemyPathList.Count : " + dicTotalEnemyPath.Count);
     }
 
     public void ExamineRotate(MiniMapManager mapMgr)
@@ -333,10 +331,8 @@ public class MapManager : MonoBehaviour
                 {
                     roadPosY = mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y;
                 }
-                Debug.Log("높이 : " + mapMgr.miniMapInfo.TileNodes[j, i].worldPosition.y);
             }
         }
-        Debug.Log("Center : " + mapMgr.miniMapInfo.GetWorldPositionCenter());
     }
 
     void ResetNewMinimap()
@@ -399,9 +395,9 @@ public class MapManager : MonoBehaviour
         isMapChange = true;
     }
 
-    public List<EnemyPathInfo> FindEnemyPath()
+    public Dictionary<Vector3, EnemyPathInfo> FindEnemyPath()
     {
-        List<EnemyPathInfo> enemyPathList = new List<EnemyPathInfo>();
+        Dictionary<Vector3, EnemyPathInfo> dicEnemyPath = new Dictionary<Vector3, EnemyPathInfo>();
         HashSet<Vector2> startNodesPos = new HashSet<Vector2>();
         MiniMapManager centralMapMgr = centralMiniMap.GetComponent<MiniMapManager>();
         Vector3 centralCenterPos = centralMapMgr.miniMapInfo.GetWorldPositionCenter();
@@ -410,44 +406,34 @@ public class MapManager : MonoBehaviour
 
         foreach (var currentMinimap in connectedMinimaps)
         {
-            //Direction oppBtnDir = OppositeDirection(button.ButtonSpawnStruct.connectDireciton);
-            //Vector3 oppBtnMinimapPos = button.transform.position + GetOffsetDirection(oppBtnDir, minimapSize);
-            //Vector2 minimapPos = new Vector2(oppBtnMinimapPos.x, oppBtnMinimapPos.z);
+            if(currentMinimap == centralMapMgr.miniMapInfo)
+            {
+                continue;
+            }
 
-            //if (dicMiniMaps.TryGetValue(minimapPos, out var startNode) == false || startNodesPos.Contains(minimapPos))
-            //{
-            //    Debug.Log("미니맵 없음");
-            //    continue;
-            //}
-
-            //startNodesPos.Add(minimapPos);
-
-            Vector2 minimapPos = currentMinimap.CurrentPos;
+            Vector3 minimapPos = currentMinimap.CurrentPos;
 
             List<Vector3> enemySpawnPoints = new List<Vector3>();
 
             foreach (var dir in currentMinimap.RoadEdges)
             {
                 Vector3 offset = GetOffsetDirection(dir, currentMinimap.GetSize());
-                Vector2 neighborMinimapPos = minimapPos + new Vector2(offset.x, offset.z);
+                Vector2 neighborMinimapPos = new Vector2(minimapPos.x, minimapPos.z) + new Vector2(offset.x, offset.z);
 
-                if (dicMiniMaps.ContainsKey(neighborMinimapPos) == false)
+                if(dicMiniMaps.TryGetValue(neighborMinimapPos, out var neighbor))
                 {
-                    int mapSize = (currentMinimap.GetSize() / currentMinimap.TileNodes.GetLength(0)) * 2;
-                    Vector3 spawnPos = currentMinimap.GetWorldPositionCenter() + GetOffsetDirection(dir, mapSize);
-                    spawnPos.y = roadPosY;
-                    Debug.Log("spawnPos : " + spawnPos);
-                    enemySpawnPoints.Add(spawnPos);
+                    if(neighbor == centralMapMgr.miniMapInfo)
+                    {
+                        continue;
+                    }
                 }
+
+                int mapSize = (currentMinimap.GetSize() / currentMinimap.TileNodes.GetLength(0)) * 2;
+                Vector3 spawnPos = currentMinimap.GetWorldPositionCenter() + GetOffsetDirection(dir, mapSize);
+                spawnPos.y = roadPosY;
+                Debug.Log("spawnPos : " + spawnPos);
+                enemySpawnPoints.Add(spawnPos);
             }
-
-            //List<MinimapNode> connectedMinimaps = CollectConnctedMinimaps(minimapPos);
-
-            //if (connectedMinimaps.Contains(centralMapMgr.miniMapInfo) == false)
-            //{
-            //    Debug.Log("연결된 미니맵에 본부가 없음");
-            //    continue;
-            //}
 
             List<Vector3> pathCandidates = new List<Vector3>();
             foreach (var minimap in connectedMinimaps)
@@ -456,7 +442,6 @@ public class MapManager : MonoBehaviour
                 {
                     pathCandidates.Add(pos);
                 }
-                totalMapsPosList.AddRange(minimap.GetRoadWorldPositions());
             }
 
 
@@ -471,14 +456,14 @@ public class MapManager : MonoBehaviour
                 List<Vector3> path = AStarPathFinding(enemySpawn, centralCenterPos, pathCandidates);
                 if (path != null && path.Count > 0)
                 {
-                    enemyPathList.Add(new EnemyPathInfo(enemySpawn, centralCenterPos, path));
+                    dicEnemyPath.Add(enemySpawn, new EnemyPathInfo(enemySpawn, centralCenterPos, path));
                 }
             }
 
-            Debug.Log("enemyPathList 개수 : " + enemyPathList.Count);
+            Debug.Log("enemyPathList 개수 : " + dicEnemyPath.Count);
         }
 
-        return enemyPathList;
+        return dicEnemyPath;
     }
 
     public List<Vector3> FindEnemyPath(Vector3 spawnPos, Vector3 goalPos)
@@ -498,40 +483,54 @@ public class MapManager : MonoBehaviour
     {
         Vector2 newMapPos = miniNode.CurrentPos;
         List<Vector3> newMinimapSpawnPoints = GetSpawnPositions(miniNode);
-        totalMapsPosList.AddRange(miniNode.GetRoadWorldPositions());
+
         foreach (var newSpawnPos in newMinimapSpawnPoints)
         {
             foreach (var dir in miniNode.RoadEdges)
             {
                 Direction oppositeDir = OppositeDirection(dir);
                 Vector3 offset = GetOffsetDirection(oppositeDir, miniNode.GetSize());
-                Vector2 neighborPos = newMapPos + new Vector2(offset.x, offset.z);
-
+                Vector2 neighborPos = new Vector2(miniNode.CurrentPos.x, miniNode.CurrentPos.z) + new Vector2(offset.x, offset.z);
                 if (dicMiniMaps.TryGetValue(neighborPos, out var neighbor) == false)
                 {
+                    Debug.Log("neighborPos에 neighbor 없음");
                     continue;
                 }
 
                 if (neighbor.RoadEdges.Contains(oppositeDir) == false)
                 {
+                    Debug.Log("이웃이 해당 Direction을 가지고 있지 않음");
                     continue;
                 }
 
-                List<Vector3> neighborSpawnPos = GetSpawnPositions(neighbor);
+                List<Vector3> neighborSpawnPosList = GetSpawnPositions(neighbor);
 
-                foreach (var neighborSpawn in neighborSpawnPos)
+                for (int i = 0; i < neighborSpawnPosList.Count; i++)
                 {
-                    EnemyPathInfo existingEnemyPath = totalEnemyPathList.FirstOrDefault(p => p.spawnPos == neighborSpawn);
+                    Debug.Log($"neighborSpawnPosList[{i}] = {neighborSpawnPosList[i]}");
+                }
 
-                    if (existingEnemyPath == null)
+                foreach (var neighborSpawn in neighborSpawnPosList)
+                {
+                    //EnemyPathInfo existingEnemyPath = dicTotalEnemyPath.FirstOrDefault(p => p.spawnPos == neighborSpawn);
+                    //if (existingEnemyPath == null)
+                    //{
+                    //    Debug.Log("existingEnemyPath null임");
+                    //    continue;
+                    //}
+                    Debug.Log("neighborSpawn : " + neighborSpawn);
+                    if (dicTotalEnemyPath.TryGetValue(neighborSpawn, out var existingEnemyPath) == false)
                     {
                         continue;
                     }
 
-                    List<Vector3> updatedPath = AStarPathFinding(newSpawnPos, neighborSpawn, totalMapsPosList);
+                    Debug.Log("기존의 맵에 EnemySpawnPos가 있음");
+                    List<Vector3> newPathCandidates = miniNode.GetRoadWorldPositions();
+                    List<Vector3> updatedPath = AStarPathFinding(newSpawnPos, neighborPos, newPathCandidates);
 
-                    if(updatedPath == null && updatedPath.Count == 0)
+                    if (updatedPath == null && updatedPath.Count == 0)
                     {
+                        Debug.Log("updatedPath 없음");
                         continue;
                     }
 
@@ -548,7 +547,7 @@ public class MapManager : MonoBehaviour
         int mapSize = (node.GetSize() / node.TileNodes.GetLength(0)) * 2;
         foreach (var neighborDir in node.RoadEdges)
         {
-            Vector3 spawnPos = node.GetWorldPositionCenter() + GetOffsetDirection(neighborDir, mapSize);
+            Vector3 spawnPos = node.CurrentPos + GetOffsetDirection(neighborDir, mapSize);
             spawnPos.y = roadPosY;
             spawnPosList.Add(spawnPos);
         }
@@ -562,7 +561,7 @@ public class MapManager : MonoBehaviour
         HashSet<Vector2> visited = new HashSet<Vector2>();
         List<MinimapNode> connectedMinimaps = new List<MinimapNode>();
 
-        var centralMinimapNode = dicMiniMaps.First().Value;
+        //var centralMinimapNode = dicMiniMaps.First().Value;
 
         queue.Enqueue(startMinimapPos);
         visited.Add(startMinimapPos);
@@ -578,10 +577,10 @@ public class MapManager : MonoBehaviour
 
             connectedMinimaps.Add(currentNode);
 
-            if(currentNode == centralMinimapNode)
-            {
-                break;
-            }
+            //if(currentNode == centralMinimapNode)
+            //{
+            //    break;
+            //}
 
             foreach(var dir in currentNode.RoadEdges)
             {

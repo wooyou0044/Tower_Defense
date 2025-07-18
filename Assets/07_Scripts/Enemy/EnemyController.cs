@@ -57,7 +57,6 @@ public class EnemyController : MonoBehaviour
 
     public void SetPath(List<Vector3> path)
     {
-        Debug.Log("SetPath »£√‚µ ! πﬁ¿∫ path.Count : " + path.Count);
         movePath = path;
         currentIndex = 0;
         isMoving = true;
