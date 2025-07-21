@@ -41,6 +41,7 @@ public class MoveState : EnemyState
 
     public override void FixedUpdateState(EnemyController enemy)
     {
+        enemy.SeperateNearbyEnemies();
     }
 }
 

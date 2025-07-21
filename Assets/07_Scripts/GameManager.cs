@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] int enemyPoolSize;
     [SerializeField] Transform enemyInstParent;
     [SerializeField] int enemySpawnCount;
+    [Range(10f, 30f)]
+    [SerializeField] float maxWaitingAppearTime;
 
     ObjectPool<EnemyController> enemyPool;
 
@@ -54,15 +56,39 @@ public class GameManager : MonoBehaviour
         {
             for(int i=0; i< enemySpawnCount; i++)
             {
-                EnemyController enemyCtrl = enemyPool.GetObject();
-                enemyCtrl.transform.position = path.spawnPos;
-                enemyCtrl.SetPath(path.movePath);
+                if(i == 0)
+                {
+                    InstantiateEnemy(path);
+                }
+                else
+                {
+                    WaitAndMakeEnemyMove(path);
+                }
             }
         }
+    }
+
+    void InstantiateEnemy(EnemyPathInfo path)
+    {
+        EnemyController enemyCtrl = enemyPool.GetObject();
+        enemyCtrl.transform.position = path.spawnPos;
+        enemyCtrl.SetPath(path.movePath);
     }
 
     public void ReturnEnemy(EnemyController enemyObjCtrl)
     {
         enemyPool.ReturnObject(enemyObjCtrl);
+    }
+
+    void WaitAndMakeEnemyMove(EnemyPathInfo pathInfo)
+    {
+        float appearTime = Random.Range(10f, maxWaitingAppearTime);
+        StartCoroutine(InstantiateAfterWaiting(pathInfo, appearTime));
+    }
+
+    IEnumerator InstantiateAfterWaiting(EnemyPathInfo path, float time)
+    {
+        yield return new WaitForSeconds(time);
+        InstantiateEnemy(path);
     }
 }

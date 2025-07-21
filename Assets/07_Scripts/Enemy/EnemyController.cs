@@ -5,18 +5,19 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] float moveSpeed = 3f;
-
     EnemyState currentState;
     public List<Vector3> movePath { get; set; }
     public bool isMoving { get; set; }
     public int currentIndex { get; set; }
     float currentHP;
+    Collider col;
 
     public Animator animator { get; set; }
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        col = GetComponent<Collider>();
     }
 
     void Start()
@@ -77,6 +78,28 @@ public class EnemyController : MonoBehaviour
             {
                 isMoving = false;
             }
+        }
+    }
+
+    public void SeperateNearbyEnemies(float radius = 1f, float pushPower = 2f)
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, radius);
+        foreach(var hit in hits)
+        {
+            if(hit.gameObject == this || hit.CompareTag("Enemy") == false)
+            {
+                continue;
+            }
+
+            Vector3 dir = transform.position - hit.transform.position;
+            float distance = dir.magnitude;
+            if (distance < 0.01f)
+            {
+                continue;
+            }
+
+            float pushStrength = pushPower * (1f - (distance / radius));
+            transform.position += dir.normalized * pushStrength * Time.deltaTime;
         }
     }
 }
