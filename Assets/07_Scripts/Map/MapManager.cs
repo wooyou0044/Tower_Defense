@@ -452,10 +452,13 @@ public class MapManager : MonoBehaviour
 
             foreach (var enemySpawn in enemySpawnPoints)
             {
-                List<Vector3> path = AStarPathFinding(enemySpawn, centralCenterPos, pathCandidates);
-                if (path != null && path.Count > 0)
+                List<Vector3> shortPath = AStarPathFinding(enemySpawn, centralCenterPos, pathCandidates);
+                List<List<Vector3>> candidates = new List<List<Vector3>>();
+                if (shortPath != null && shortPath.Count > 0)
                 {
-                    dicEnemyPath.Add(enemySpawn, new EnemyPathInfo(enemySpawn, centralCenterPos, path));
+                    candidates = FindAllCandidatePathsDFS(enemySpawn, centralCenterPos, pathCandidates);
+                    //RemoveShortPathFromCandidates(candidates, shortPath);
+                    dicEnemyPath.Add(enemySpawn, new EnemyPathInfo(enemySpawn, centralCenterPos, shortPath, candidates));
                 }
             }
 
@@ -492,6 +495,14 @@ public class MapManager : MonoBehaviour
         {
             List<Vector3> neighborSpawnPos = GetSpawnPositions(neighborNode);
 
+            Vector2 neighborPosV2 = new Vector2(neighborNode.CurrentPos.x, neighborNode.CurrentPos.z);
+            List<MinimapNode> neighborConnectMinimaps = CollectConnctedMinimaps(neighborPosV2);
+            List<Vector3> allNeighborRoads = new List<Vector3>();
+            foreach (var neighborMap in neighborConnectMinimaps)
+            {
+                allNeighborRoads.AddRange(neighborMap.GetRoadWorldPositions());
+            }
+
             foreach (var neighborSpawn in neighborSpawnPos)
             {
                 foreach(var newSpawn in newMiniSpawnPos)
@@ -507,10 +518,14 @@ public class MapManager : MonoBehaviour
                 if (alreadyGone.Contains(neighborSpawn) == false && dicTotalEnemyPath.ContainsKey(neighborSpawn))
                 {
                     List<Vector3> newNeighborPath = AStarPathFinding(neighborSpawn, centralPos, allRoads);
-
-                    if(newNeighborPath != null && newNeighborPath.Count > 0)
+                    List<List<Vector3>> candidates = new List<List<Vector3>>();
+                    if (newNeighborPath != null && newNeighborPath.Count > 0)
                     {
-                        dicTotalEnemyPath[neighborSpawn] = new EnemyPathInfo(neighborSpawn, centralPos, newNeighborPath);
+                        candidates = FindAllCandidatePathsDFS(neighborSpawn, centralPos, allNeighborRoads);
+                        Debug.Log("neighbor Candidates.Count : " + candidates.Count);
+                        //candidates.RemoveAll(pathCandidate => IsPathSame(pathCandidate, newNeighborPath));
+                        //RemoveShortPathFromCandidates(candidates, newNeighborPath);
+                        dicTotalEnemyPath[neighborSpawn] = new EnemyPathInfo(neighborSpawn, centralPos, newNeighborPath, candidates);
                     }
                 }
             }
@@ -526,10 +541,15 @@ public class MapManager : MonoBehaviour
             {
                 continue;
             }
-            List<Vector3> path = AStarPathFinding(newSpawn, centralPos, allRoads);
-            if (path != null && path.Count > 0)
+            List<Vector3> shortPath = AStarPathFinding(newSpawn, centralPos, allRoads);
+            List<List<Vector3>> candidates = new List<List<Vector3>>();
+            if (shortPath != null && shortPath.Count > 0)
             {
-                dicTotalEnemyPath[newSpawn] = new EnemyPathInfo(newSpawn, centralPos, path);
+                candidates = FindAllCandidatePathsDFS(newSpawn, centralPos, allRoads);
+                Debug.Log("new Candidates.Count : " + candidates.Count);
+                //RemoveShortPathFromCandidates(candidates, shortPath);
+                //candidates.RemoveAll(pathCandidate => IsPathSame(pathCandidate, shortPath));
+                dicTotalEnemyPath[newSpawn] = new EnemyPathInfo(newSpawn, centralPos, shortPath, candidates);
                 alreadyGone.Add(newSpawn);
             }
         }
@@ -691,6 +711,52 @@ public class MapManager : MonoBehaviour
             }
         }
         return path;
+    }
+
+    List<List<Vector3>> FindAllCandidatePathsDFS(Vector3 enemySpawnPos, Vector3 goalPos, List<Vector3> allRoads)
+    {
+        List<List<Vector3>> candidates = new List<List<Vector3>>();
+        HashSet<Vector3> visited = new HashSet<Vector3>();
+        List<Vector3> currentPath = new List<Vector3>();
+
+        float gridSize = 4f;
+
+        Vector3[] directions =
+        {
+            new Vector3(gridSize, 0, 0),
+            new Vector3(-gridSize, 0, 0),
+            new Vector3(0, 0, gridSize),
+            new Vector3(0, 0, -gridSize)
+        };
+
+        // DFS Àç±ÍÇÔ¼ö
+        void DFSAlgorithm(Vector3 current)
+        {
+            if(visited.Contains(current) || allRoads.Contains(current) == false)
+            {
+                return;
+            }
+
+            visited.Add(current);
+            currentPath.Add(current);
+
+            if (current == goalPos)
+            {
+                candidates.Add(new List<Vector3>(currentPath));
+            }
+            else
+            {
+                foreach (var dir in directions)
+                {
+                    DFSAlgorithm(current + dir);
+                }
+            }
+            visited.Remove(current);
+            currentPath.RemoveAt(currentPath.Count - 1);
+        }
+
+        DFSAlgorithm(enemySpawnPos);
+        return candidates;
     }
 
     AStarNode GetCloseOpenNode(Vector3 target, Dictionary<Vector3, AStarNode> dicMap)
