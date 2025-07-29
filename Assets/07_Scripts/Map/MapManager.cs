@@ -766,7 +766,7 @@ public class MapManager : MonoBehaviour
 
     float Heurisitic(Vector3 startPos, Vector3 endPos)
     {
-        return Mathf.Abs(startPos.z - startPos.x) - Mathf.Abs(endPos.z - endPos.x);
+        return Mathf.Abs(startPos.x - endPos.x) + Mathf.Abs(startPos.z - endPos.z);
     }
 
     List<AStarNode> GetNeighbors(AStarNode node, Dictionary<Vector3, AStarNode> dicMap)

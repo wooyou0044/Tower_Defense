@@ -3334,7 +3334,7 @@ MonoBehaviour:
   enemy: {fileID: 7106108068089380290, guid: 587f5ca550541d446b5ea7570bc074c1, type: 3}
   enemyPoolSize: 30
   enemyInstParent: {fileID: 1623665375}
-  enemySpawnCount: 5
+  enemySpawnCount: 10
   maxWaitingAppearTime: 25
 --- !u!1001 &1208567351
 PrefabInstance:
