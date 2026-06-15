@@ -6,6 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     [SerializeField] float moveSpeed = 3f;
     EnemyState currentState;
+    Enemy enemy;
     public List<Vector3> movePath { get; set; }
     public bool isMoving { get; set; }
     public int currentIndex { get; set; }
@@ -23,6 +24,7 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         //ChangeState(new IdleState());
+        enemy = new Enemy();
     }
 
     void Update()
@@ -101,5 +103,10 @@ public class EnemyController : MonoBehaviour
             float pushStrength = pushPower * (1f - (distance / radius));
             transform.position += dir.normalized * pushStrength * Time.deltaTime;
         }
+    }
+
+    public int AttackEnemyAtt()
+    {
+        return enemy.GetEnemyAtt();
     }
 }

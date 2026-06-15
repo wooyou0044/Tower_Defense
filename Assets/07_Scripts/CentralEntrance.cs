@@ -8,7 +8,10 @@ public class CentralEntrance : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Enemy"))
         {
-            GameManager.Instance.ReturnEnemy(other.GetComponent<EnemyController>());
+            EnemyController enemyCtrl = other.GetComponent<EnemyController>();
+            GameManager.Instance.ReturnEnemy(enemyCtrl);
+            GameManager.Instance.EnemyAttackCentral(enemyCtrl.AttackEnemyAtt());
+            Debug.Log("적이 쳐들어옴");
         }
     }
 }

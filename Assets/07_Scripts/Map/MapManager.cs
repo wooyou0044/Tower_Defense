@@ -16,6 +16,7 @@ public class MapManager : MonoBehaviour
 {
     static MapManager _instance;
 
+    [SerializeField] UIManager uiMgr;
     [SerializeField] GameObject centralMiniMap;
     [SerializeField] GameObject[] miniMaps;
     [SerializeField] Transform miniMapsParent;
@@ -381,6 +382,13 @@ public class MapManager : MonoBehaviour
 
     public void ChangeMinimap()
     {
+        if(GameManager.Instance.GetPlayerMapRerollCoin <= 0)
+        {
+            uiMgr.SetRerollMapBtn(false);
+            return;
+        }
+        uiMgr.SetRerollMapBtn(true);
+        GameManager.Instance.UseRerollMap();
         Destroy(newMinimap);
         newMinimap = qPreviewMinimap.Dequeue();
         newMinimap.SetActive(false);
