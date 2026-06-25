@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f32324b2d9a4da04d9c7d79504e5a3a2, type: 3}
+  m_Name: Canon01
+  m_EditorClassIdentifier: 
+  towerID: 1001
+  towerName: "\uB300\uD3EC01"
+  buildCoin: 200
+  towerCount: 0
+  att: 0
+  defType: 0
+  attRangeRad: 0
+  defTowerObject: {fileID: 265240483315890705, guid: b8ce90b52ede0eb48a103f0945f0d781, type: 3}
+  defTowerImage: {fileID: 21300000, guid: 74e4e82e26814ac4eb8d15f3ceae051d, type: 3}

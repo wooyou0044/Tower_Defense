@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f32324b2d9a4da04d9c7d79504e5a3a2, type: 3}
+  m_Name: Radar01
+  m_EditorClassIdentifier: 
+  towerID: 2001
+  towerName: "\uB808\uC774\uB354"
+  buildCoin: 50
+  towerCount: 0
+  att: 0
+  defType: 1
+  attRangeRad: 0
+  defTowerObject: {fileID: 4259227159275143708, guid: 99207c0164efd4b48954bdd056be6d3b, type: 3}
+  defTowerImage: {fileID: 21300000, guid: 91b3a875bd4e91d4f9b519e23a1e324b, type: 3}

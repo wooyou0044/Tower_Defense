@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     // 이벤트 발생
     public event Action<int, int> OnChangeBaseHp;
     public event Action<int, int> OnChangeWaveCount;
+    public event Action<int> OnChangeRerollCoin;
 
     public int GetPlayerBaseHP
     {
@@ -82,6 +83,9 @@ public class GameManager : MonoBehaviour
         uiMgr.ChangeBaseHp(fullBaseHP, getPlayerStat._baseHP);
         curWaveCount = 1;
         uiMgr.ChangeWaveCount(waveCount, curWaveCount);
+        uiMgr.ChangeRerollCoin(getPlayerStat._mapRerollCoin);
+
+        uiMgr.MakeTowerBtn();
     }
 
     void Update()
@@ -99,6 +103,9 @@ public class GameManager : MonoBehaviour
             curWaveCount++;
             OnChangeWaveCount.Invoke(waveCount, curWaveCount);
             curEnemyCount = 0;
+
+            // 한 웨이브가 끝나고 맵에 +버튼 생성
+            MapManager.Instance.SetActiveAllCreateMinimapBtn(true);
         }
     }
 
@@ -187,9 +194,10 @@ public class GameManager : MonoBehaviour
         OnChangeBaseHp.Invoke(fullBaseHP, getPlayerStat._baseHP);
     }
 
-    public void UseRerollMap()
+    public int UseRerollMap()
     {
         // 25씩 사용
         getPlayerStat._mapRerollCoin -= rerollMapCoin;
+        return getPlayerStat._mapRerollCoin;
     }
 }

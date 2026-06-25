@@ -314,7 +314,12 @@ public class MapManager : MonoBehaviour
         ResetNewMinimap();
 
         // 임시로 테스트
-        SetActiveAllCreateMinimapBtn(true);
+        //SetActiveAllCreateMinimapBtn(true);
+        SetActiveAllCreateMinimapBtn(false);
+
+        // Reroll Zone 버튼 UI 지우기
+        uiMgr.SetDeactiveRerollPanel();
+
     }
 
     void ResetMinimapWorldPosition(MiniMapManager mapMgr)
@@ -388,7 +393,7 @@ public class MapManager : MonoBehaviour
             return;
         }
         uiMgr.SetRerollMapBtn(true);
-        GameManager.Instance.UseRerollMap();
+
         Destroy(newMinimap);
         newMinimap = qPreviewMinimap.Dequeue();
         newMinimap.SetActive(false);
@@ -400,6 +405,9 @@ public class MapManager : MonoBehaviour
         qPreviewMinimap.Enqueue(newPreviewMap);
         ChangePreviewMinimap();
         isMapChange = true;
+
+        // RerollMapCoin 줄어들기
+        uiMgr.ChangeRerollCoin(GameManager.Instance.UseRerollMap());
     }
 
     public Dictionary<Vector3, EnemyPathInfo> FindEnemyPath()
