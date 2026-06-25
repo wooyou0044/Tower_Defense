@@ -1031,12 +1031,12 @@ MonoBehaviour:
   playerInfoPanel: {fileID: 1805796021}
   rerollMapPanel: {fileID: 1303638457}
   sendWavePanel: {fileID: 551964694}
+  rewardPanel: {fileID: 1846497566}
   baseHPSlider: {fileID: 1950141335}
   baseHPTxt: {fileID: 1378769020}
   curWaveCountTxt: {fileID: 1955375430}
   totWaveCountTxt: {fileID: 1869740834}
   rerollMapCoinTxt: {fileID: 184671251}
-  buildBtnViewPanel: {fileID: 634200918}
   buildBtnGridArea: {fileID: 473418293}
   buildBtnPrefab: {fileID: 7654389490126813495, guid: fe76992199ee2d54aa0e83f214ffa411, type: 3}
   fillAreaImg: {fileID: 2023429094}
@@ -4612,7 +4612,7 @@ Transform:
   m_GameObject: {fileID: 1269845302}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 931.7432, y: 536.85205, z: 244.18506}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

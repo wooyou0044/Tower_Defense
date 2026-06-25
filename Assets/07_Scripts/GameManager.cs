@@ -85,7 +85,6 @@ public class GameManager : MonoBehaviour
         uiMgr.ChangeWaveCount(waveCount, curWaveCount);
         uiMgr.ChangeRerollCoin(getPlayerStat._mapRerollCoin);
 
-        uiMgr.MakeTowerBtn();
     }
 
     void Update()
@@ -99,6 +98,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("여기서 완전히 한 웨이브가 끝남");
             uiMgr.SetActiveSendWave(true);
+            uiMgr.SetBuildMapActive(false);
             // 원래 한 웨이브 끝나고 아이템 선택하면 waveCount++ 해야 하는데 임의로
             curWaveCount++;
             OnChangeWaveCount.Invoke(waveCount, curWaveCount);
@@ -115,6 +115,7 @@ public class GameManager : MonoBehaviour
         //적들이 움직이는 중이면 Space도 막고 버튼도 집어넣어야 함
         MapManager.Instance.SetActiveAllCreateMinimapBtn(false);
         uiMgr.SetActiveSendWave(false);
+        uiMgr.SetBuildMapActive(false);
         //List<EnemyPathInfo> enemyPaths = MapManager.Instance.EnemyPathInfos;
         Dictionary<Vector3, EnemyPathInfo> dicEnemyPath = MapManager.Instance.EnemyPathInfos;
         List<EnemyPathInfo> enemyPaths = new List<EnemyPathInfo>(dicEnemyPath.Values);

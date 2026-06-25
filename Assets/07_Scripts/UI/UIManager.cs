@@ -9,20 +9,19 @@ public class UIManager : MonoBehaviour
     [SerializeField] Image playerInfoPanel;
     [SerializeField] Image rerollMapPanel;
     [SerializeField] Image sendWavePanel;
+    [SerializeField] Image rewardPanel;
     [SerializeField] Slider baseHPSlider;
     [SerializeField] TextMeshProUGUI baseHPTxt;
     [SerializeField] TextMeshProUGUI curWaveCountTxt;
     [SerializeField] TextMeshProUGUI totWaveCountTxt;
     [SerializeField] TextMeshProUGUI rerollMapCoinTxt;
     [Header("Build Button Area")]
-    [SerializeField] GameObject buildBtnViewPanel;
     [SerializeField] Transform buildBtnGridArea;
     [SerializeField] GameObject buildBtnPrefab;
     [Header("HP Slider")]
     [SerializeField] Image fillAreaImg;
     [SerializeField] Color[] hpColor;
 
-    PlayerState getPlayerStat;
     Animator rerollMapAnimator;
     Animator sendWaveAnimator;
 
@@ -30,6 +29,8 @@ public class UIManager : MonoBehaviour
     Button sendWaveBtn;
 
     bool isRerollBtnActive;
+
+    List<BuildBtnController> towerBtnCtrlList;
 
     private void Awake()
     {
@@ -53,6 +54,11 @@ public class UIManager : MonoBehaviour
         fillAreaImg.color = hpColor[0];
 
         isRerollBtnActive = true;
+
+        // 임시로 시작할 때 빌드 버튼 안 생기게 만들기
+        towerBtnCtrlList = new List<BuildBtnController>();
+        MakeTowerBtn();
+        SetBuildMapActive(false);
 
         // 이벤트 구독
         GameManager.Instance.OnChangeBaseHp += ChangeBaseHp;
@@ -144,24 +150,58 @@ public class UIManager : MonoBehaviour
         rerollMapCoinTxt.text = rerollCoin.ToString();
     }
 
-    public void MakeTowerBtn()
+    void MakeTowerBtn()
     {
         List<DefTower> towerList = new List<DefTower>();
         towerList = BuildManager.Instance.MakeInitRndTowerPack();
         for(int i=0; i<towerList.Count; i++)
         {
-            GameObject towerBtn = Instantiate(buildBtnPrefab, buildBtnGridArea);
-            BuildBtnController btnCtrl = towerBtn.GetComponent<BuildBtnController>();
-            btnCtrl.btnTower = towerList[i];
-            btnCtrl.ChangeBtnInfo(towerList[i].buildCoin, towerList[i].towerCount, towerList[i].defTowerImage);
+            //GameObject towerBtn = Instantiate(buildBtnPrefab, buildBtnGridArea);
+            //BuildBtnController btnCtrl = towerBtn.GetComponent<BuildBtnController>();
+            //btnCtrl.btnTower = towerList[i];
+            //btnCtrl.ChangeBtnInfo(towerList[i].buildCoin, towerList[i].towerCount, towerList[i].defTowerImage);
+
+            MakeTowerBtnPrefab(towerList[i]);
         }
     }
 
-    public void MakeRewardTowerBtn(DefTower tower)
+    public void MakeTowerBtnPrefab(DefTower tower)
     {
         GameObject towerBtn = Instantiate(buildBtnPrefab, buildBtnGridArea);
         BuildBtnController btnCtrl = towerBtn.GetComponent<BuildBtnController>();
+        btnCtrl.btnTower = tower;
         btnCtrl.ChangeBtnInfo(tower.buildCoin, tower.towerCount, tower.defTowerImage);
+        btnCtrl.SetInteractImgActive(false);
+        towerBtnCtrlList.Add(btnCtrl);
+    }
+
+    public void SetBuildMapActive(bool isActive)
+    {
+        if(sendWavePanel.gameObject.activeSelf != isActive)
+        {
+            sendWavePanel.gameObject.SetActive(isActive);
+        }
+        for(int i=0; i< towerBtnCtrlList.Count; i++)
+        {
+            Button btn = towerBtnCtrlList[i].GetComponent<Button>();
+            if(isActive == false)
+            {
+                towerBtnCtrlList[i].SetOffChooseBtnOutline();
+            }
+            towerBtnCtrlList[i].IsBtnActive = isActive;
+            towerBtnCtrlList[i].SetInteractImgActive(!isActive);
+            btn.interactable = isActive;
+        }
+    }
+
+    public void SetRewardPanelActive(bool isActive)
+    {
+        rewardPanel.gameObject.SetActive(isActive);
+    }
+
+    void ChangeRewardPanel()
+    {
+
     }
 
     void OnDisable()

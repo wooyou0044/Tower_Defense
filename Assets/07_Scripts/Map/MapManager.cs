@@ -319,7 +319,7 @@ public class MapManager : MonoBehaviour
 
         // Reroll Zone 버튼 UI 지우기
         uiMgr.SetDeactiveRerollPanel();
-
+        uiMgr.SetBuildMapActive(true);
     }
 
     void ResetMinimapWorldPosition(MiniMapManager mapMgr)

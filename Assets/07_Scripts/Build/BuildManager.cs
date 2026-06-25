@@ -38,7 +38,17 @@ public class BuildManager : MonoBehaviour
 
     void Update()
     {
-        
+        if(prevTower == null)
+        {
+            return;
+        }
+        UpdateTowerPlace();
+
+        if(Input.GetMouseButtonDown(1))
+        {
+            // 들고 있는 타워 회전
+            RotatePrevTower();
+        }
     }
 
     void InitiateDefTower()
@@ -88,12 +98,33 @@ public class BuildManager : MonoBehaviour
     //    tower.TowerID++;
     //}
 
-    public void MakeTowerPrefab(GameObject tower)
+    public void SetActiveTowerPrefab(DefTower tower)
     {
-        if(prevTower != null && tower != prevTower)
+        if(tower == prevTower)
         {
-
+            return;
         }
+        if(prevTower != null)
+        {
+            prevTower.SetActive(false);
+        }
+        int towerID = tower.towerID;
+        dicTowerObject[towerID].SetActive(true);
+        prevTower = dicTowerObject[towerID];
+    }
+
+    void UpdateTowerPlace()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = 10f;
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+        prevTower.transform.position = worldPos;
+    }
+
+    void RotatePrevTower()
+    {
+        // 가지고 있는 타워 회전
+        prevTower.transform.Rotate(Vector3.forward, 90);
     }
 
     // 임시로 꺼졌을 때 DefTower에 있는 Count 값이 초기화되게 만들기
