@@ -19,5 +19,5 @@ MonoBehaviour:
   att: 0
   defType: 0
   attRangeRad: 0
-  defTowerObject: {fileID: 265240483315890705, guid: b8ce90b52ede0eb48a103f0945f0d781, type: 3}
+  defTowerObject: {fileID: 353344858663643544, guid: b8ce90b52ede0eb48a103f0945f0d781, type: 3}
   defTowerImage: {fileID: 21300000, guid: 74e4e82e26814ac4eb8d15f3ceae051d, type: 3}

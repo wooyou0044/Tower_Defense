@@ -1709,6 +1709,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8f58ffc128d604f45ba09ad506406e03, type: 2}
   initRndTowerNum: 5
   buildTowerTrans: {fileID: 1269845303}
+  previewTowerMat: {fileID: 2100000, guid: a5165c570e3fd4240af04eb1d728378e, type: 2}
 --- !u!4 &415186253
 Transform:
   m_ObjectHideFlags: 0
