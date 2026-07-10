@@ -16,6 +16,7 @@ public class MinimapNode
     private TileNode[,] tileNodes;
     private HashSet<Direction> roadEdges;
     private Vector3 currentPos;
+    public Vector2Int startGlobalIndex { get; set; }
 
     public TileNode[,] TileNodes
     {

@@ -16,6 +16,10 @@ public class MiniMapManager : MonoBehaviour
     Material originMat;
 
     public MinimapNode miniMapInfo { get; private set; }
+    public int GetGridSize
+    {
+        get => indexSize;
+    }
 
     private void Awake()
     {
@@ -416,5 +420,42 @@ public class MiniMapManager : MonoBehaviour
         Vector3 worldPos = minimapTrans.TransformPoint(localOffset);
         //worldPos.y = roadPosY;
         return worldPos;
+    }
+
+    /// <summary>
+    /// 해당 미니맵의 중심 인덱스 저장
+    /// </summary>
+    /// <param name="direct">설치하려는 Minimap의 기존 미니맵의 방향</param>
+    public void SetGlobalIndex(MinimapNode originMapNodeInfo, Direction direct)
+    {
+        Vector2Int originStartIdx = originMapNodeInfo.startGlobalIndex;
+        int tileIndexSize = tileNodes.GetLength(0);
+        switch (direct)
+        {
+            case Direction.Top:
+                miniMapInfo.startGlobalIndex = new Vector2Int(originStartIdx.x, originStartIdx.y + tileIndexSize);
+                break;
+            case Direction.Bottom:
+                miniMapInfo.startGlobalIndex = new Vector2Int(originStartIdx.x, originStartIdx.y - tileIndexSize);
+                break;
+            case Direction.Left:
+                miniMapInfo.startGlobalIndex = new Vector2Int(originStartIdx.x - tileIndexSize, originStartIdx.y);
+                break;
+            case Direction.Right:
+                miniMapInfo.startGlobalIndex = new Vector2Int(originStartIdx.x + tileIndexSize, originStartIdx.y);
+                break;
+        }
+        SetTileNodeGlobalIndex(miniMapInfo.startGlobalIndex);
+    }
+
+    void SetTileNodeGlobalIndex(Vector2Int startIndex)
+    {
+        for(int i=0; i<tileNodes.GetLength(0); i++)
+        {
+            for(int j=0; j<tileNodes.GetLength(1); j++)
+            {
+                tileNodes[i, j].globalIndex = new Vector2Int(startIndex.x + j, startIndex.y - i);
+            }
+        }
     }
 }

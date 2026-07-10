@@ -7,32 +7,51 @@ public class TowerController : MonoBehaviour
     [SerializeField] int tileSize = 3;
 
     Collider footPrintCol;
-    Vector2 towerSize;
+    Vector2Int towerSize;
     bool isPrevMatChanged;
+    bool isRotate;
+    MeshRenderer towerRend;
+    Material originMat;
+    Material newTowerMat;
+    DefTower myTower;
 
-    public Vector2 GetSize
+    public DefTower MyTower { get => myTower; }
+
+    public Vector2Int GetSize
     {
-        get => towerSize;
+        get
+        {
+            if(isRotate == false)
+            {
+                return towerSize;
+            }
+            else
+            {
+                towerSize = new Vector2Int(towerSize.y, towerSize.x);
+                return towerSize;
+            }
+        }
     }
     public bool GetPrevMatChanged
     {
         get => isPrevMatChanged;
         set => isPrevMatChanged = value;
     }
-
-    public GameObject GetMainTower
+    public bool GetIsRotate
     {
-        get => transform.GetChild(0).gameObject;
+        get => isRotate;
+        set => isRotate = value;
     }
 
     private void Awake()
     {
         footPrintCol = GetComponent<Collider>();
+        towerRend = transform.GetChild(0).GetComponent<MeshRenderer>();
+        originMat = towerRend.material;
     }
     void Start()
     {
         towerSize = GetTowerSize(footPrintCol);
-        Debug.Log("타워 사이즈 : ( " + towerSize.x + " , " + towerSize.y + " )");
         isPrevMatChanged = false;
     }
 
@@ -41,27 +60,46 @@ public class TowerController : MonoBehaviour
         
     }
 
-    Vector2 GetTowerSize(Collider col)
+    Vector2Int GetTowerSize(Collider col)
     {
-        Vector2 towerNodeSize;
+        Vector2Int towerNodeSize;
         Vector3 size = col.bounds.size;
         int width = Mathf.RoundToInt(size.x / tileSize);
         int height = Mathf.RoundToInt(size.z / tileSize);
-        towerNodeSize = new Vector2(width, height);
+        towerNodeSize = new Vector2Int(width, height);
         return towerNodeSize;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void ChangeTowerMaterial(Material newMat)
     {
-        TileNode tileNode = other.GetComponent<TileNode>();
-        // 임시로 TileType 알아보기 위해
-        if(tileNode == null)
+        newTowerMat = new Material(newMat);
+        newTowerMat.SetTexture("_MainTexture", originMat.GetTexture("_BaseMap"));
+        newTowerMat.SetFloat("_isBuildMinimap", 1f);
+        newTowerMat.SetFloat("_Transparency", 0.8f);
+        towerRend.material = newTowerMat;
+    }
+
+    public void ChangeMatCanBuild(bool isCanBuild)
+    {
+        float matValue = newTowerMat.GetFloat("_isRoadConnect");
+        float typeCast = isCanBuild ? 1f : 0f;
+        if(matValue == typeCast)
         {
+            Debug.Log("같으니까 돌아가!");
             return;
+        }
+        if (isCanBuild == true)
+        {
+            newTowerMat.SetFloat("_isRoadConnect", 1f);
         }
         else
         {
-            Debug.Log("부딪힌 타일 노드 타입 : " + tileNode.type);
+            newTowerMat.SetFloat("_isRoadConnect", 0f);
         }
+    }
+
+    public void SetTowerInfo(DefTower tower)
+    {
+        myTower = tower;
     }
 }

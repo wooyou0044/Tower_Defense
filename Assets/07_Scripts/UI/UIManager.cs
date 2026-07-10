@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] Image rerollMapPanel;
     [SerializeField] Image sendWavePanel;
     [SerializeField] Image rewardPanel;
+    [SerializeField] Image canNotBuildIcon;
     [SerializeField] Slider baseHPSlider;
     [SerializeField] TextMeshProUGUI baseHPTxt;
     [SerializeField] TextMeshProUGUI curWaveCountTxt;
@@ -32,20 +33,22 @@ public class UIManager : MonoBehaviour
 
     List<BuildBtnController> towerBtnCtrlList;
 
+    RectTransform iconRectTrans;
+
     private void Awake()
     {
-        playerInfoPanel = playerInfoPanel.GetComponent<Image>();
         baseHPSlider = baseHPSlider.GetComponent<Slider>();
         rerollMapAnimator = rerollMapPanel.GetComponent<Animator>();
         sendWaveAnimator = sendWavePanel.GetComponent<Animator>();
 
         rerollMapBtn = rerollMapPanel.GetComponentInChildren<Button>();
         sendWaveBtn = sendWavePanel.GetComponentInChildren<Button>();
+
+        iconRectTrans = canNotBuildIcon.GetComponent<RectTransform>();
     }
 
     void Start()
     {
-        Debug.Log(rerollMapPanel.gameObject);
         if(GameManager.Instance != null)
         {
             baseHPSlider.maxValue = GameManager.Instance.GetPlayerBaseHP;
@@ -59,6 +62,7 @@ public class UIManager : MonoBehaviour
         towerBtnCtrlList = new List<BuildBtnController>();
         MakeTowerBtn();
         SetBuildMapActive(false);
+        canNotBuildIcon.gameObject.SetActive(false);
 
         // 이벤트 구독
         GameManager.Instance.OnChangeBaseHp += ChangeBaseHp;
@@ -197,6 +201,20 @@ public class UIManager : MonoBehaviour
     public void SetRewardPanelActive(bool isActive)
     {
         rewardPanel.gameObject.SetActive(isActive);
+    }
+
+    public void SetCanNotBuildIconActive(bool isActive)
+    {
+        canNotBuildIcon.gameObject.SetActive(isActive);
+    }
+
+    public void SetCanNotBuildIconPos(Vector3 pos)
+    {
+        if(canNotBuildIcon.gameObject.activeSelf == false)
+        {
+            SetCanNotBuildIconActive(true);
+        }
+        canNotBuildIcon.transform.position = pos + new Vector3(20, 30, 0);
     }
 
     void ChangeRewardPanel()

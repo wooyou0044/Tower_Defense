@@ -61,7 +61,7 @@ public class CreateMiniMap : MonoBehaviour
     public void PressCreateMinimap()
     {
         MapManager.Instance.RemoveCreateMapBtnList(this);
-        MapManager.Instance.AddDictionaryNewMinimap();
+        MapManager.Instance.AddDictionaryNewMinimap(miniMapStruct);
     }
 
     public void OnMouseHoverEnter()

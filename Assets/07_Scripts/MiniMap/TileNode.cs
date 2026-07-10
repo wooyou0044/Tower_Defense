@@ -16,6 +16,9 @@ public class TileNode : MonoBehaviour
     public float height { get; set; }
     public Vector3 worldPosition { get; set; }
 
+    public Vector2Int globalIndex { get; set; }
+    public TowerController installedTower { get; set; }
+
     public float gridSize
     {
         get

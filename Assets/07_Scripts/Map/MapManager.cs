@@ -30,6 +30,7 @@ public class MapManager : MonoBehaviour
     Queue<GameObject> qPreviewMinimap;
     Direction alreadyConnectedDir;
     PathFinding path;
+    MinimapNode neighborNode;
 
     Material originMat;
     bool isMapChange = false;
@@ -84,10 +85,15 @@ public class MapManager : MonoBehaviour
         //Direction minimapRoadDir = miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges.First();
         //Direction connectRoadDir = OppositeDirection(minimapRoadDir);
 
-        // Dictionary에 등록
-        dicMiniMaps.Add(minimapPos, miniMap.GetComponent<MiniMapManager>().miniMapInfo);
+        MiniMapManager centMinimapMgr = miniMap.GetComponent<MiniMapManager>();
+        int centGridSize = centMinimapMgr.GetGridSize;
+        Vector2Int startIndex = new Vector2Int(-centGridSize / 2, centGridSize / 2);
+        centMinimapMgr.miniMapInfo.startGlobalIndex = startIndex;
 
-        foreach (var direction in miniMap.GetComponent<MiniMapManager>().miniMapInfo.RoadEdges)
+        // Dictionary에 등록
+        dicMiniMaps.Add(minimapPos, centMinimapMgr.miniMapInfo);
+
+        foreach (var direction in centMinimapMgr.miniMapInfo.RoadEdges)
         {
             Direction connectRoadDir = OppositeDirection(direction);
 
@@ -137,6 +143,10 @@ public class MapManager : MonoBehaviour
 
             // 미니맵 버튼 생성
             MakeCreateMinimapButton(newMinimap, connectRoadDir);
+
+            Debug.Log("미니맵 : " + newMinimap);
+            // 미니맵의 타일들 GlobalIndex 세팅하기
+            minimapMgr.SetGlobalIndex(centMinimapMgr.miniMapInfo, direction);
 
             newMinimap = null;
         }
@@ -290,7 +300,7 @@ public class MapManager : MonoBehaviour
         return true;
     }
 
-    public void AddDictionaryNewMinimap()
+    public void AddDictionaryNewMinimap(MinimapSpawnStruct mapSpawnStruct)
     {
         Vector2 newMiniMapPos = new Vector2(newMinimap.transform.position.x, newMinimap.transform.position.z);
         MinimapNode node = newMinimap.GetComponent<MiniMapManager>().miniMapInfo;
@@ -304,6 +314,15 @@ public class MapManager : MonoBehaviour
         Debug.Log("Dictionary 개수 : " + dicMiniMaps.Count);
 
         NewMinimapInstalled(node);
+
+        // 미니맵의 tileNode GlobalIndex 지정
+        Direction neighborMapDirect = mapSpawnStruct.connectDireciton;
+        MinimapNode neighborNode = GetNeighborMinimapNode(neighborMapDirect, node);
+        // 새로 설치한 미니맵 GlobalIndex 지정
+        if (neighborNode != null)
+        {
+            mapMgr.SetGlobalIndex(neighborNode, neighborMapDirect);
+        }
 
         minimapMgr.ResetOriginMaterial();
 
@@ -320,6 +339,19 @@ public class MapManager : MonoBehaviour
         // Reroll Zone 버튼 UI 지우기
         uiMgr.SetDeactiveRerollPanel();
         uiMgr.SetBuildMapActive(true);
+    }
+
+    MinimapNode GetNeighborMinimapNode(Direction neighborDir, MinimapNode newMinimapNode)
+    {
+        Direction newMapDir = OppositeDirection(neighborDir);
+        Vector3 offset = GetOffsetDirection(newMapDir, newMinimapNode.GetSize());
+        Vector3 newMapWorldPos = newMinimapNode.GetWorldPositionCenter();
+        Vector2 neighborPos = new Vector2(newMapWorldPos.x, newMapWorldPos.z) + new Vector2(offset.x, offset.z);
+        if(dicMiniMaps.TryGetValue(neighborPos, out MinimapNode neighbor))
+        {
+            return neighbor;
+        }
+        return null;
     }
 
     void ResetMinimapWorldPosition(MiniMapManager mapMgr)
