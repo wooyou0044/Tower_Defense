@@ -56,14 +56,19 @@ public class MiniMapManager : MonoBehaviour
             }
         }
 
+        Debug.Log(gameObject);
+
         foreach (Transform child in transform)
         {
-            TileNode node = child.GetComponent<TileNode>();
-            if (node == null)
+            TileNodeController tileCtrl = child.GetComponent<TileNodeController>();
+            if (tileCtrl == null)
             {
-                Debug.Log(node.gameObject);
+                Debug.Log(tileCtrl.gameObject);
                 continue;
             }
+
+            TileNode node = new TileNode(tileCtrl.Type);
+
             Vector3 pos = child.localPosition;
             pos.x += 8f;
             pos.z -= 8f;
@@ -249,7 +254,17 @@ public class MiniMapManager : MonoBehaviour
         //{
         //    for (int j = 0; j < indexSize; j++)
         //    {
-        //        Debug.Log($"tileNodes[{i},{j}].worldPosition = {tileNodes[i, j].worldPosition}");
+        //        Debug.Log($"tileNodes[{i},{j}].type = {tileNodes[i, j].type}");
+        //    }
+        //}
+
+        //for (int i = 0; i < indexSize; i++)
+        //{
+        //    for (int j = 0; j < indexSize; j++)
+        //    {
+        //        Debug.Log($"tileNodes[{i},{j}].type = {(TileType)tileNodes[i, j].type}");
+        //        Debug.Log($"tileNodes[{i},{j}].globalIndex = {tileNodes[i, j].globalIndex}");
+        //        Debug.Log($"tileNodes[{i},{j}].height = {tileNodes[i, j].height}");
         //    }
         //}
     }
@@ -350,7 +365,7 @@ public class MiniMapManager : MonoBehaviour
 
     // 길이 연결되어 있지만 맵끼리 연결되지 않은 곳에 맵 생성 버튼 만들기
     public void CreateMinimapButton(Vector3 createPos, Direction createDirect)
-    {
+    { 
         GameObject button = Instantiate(makeMiniMapButton, transform);
         Vector3 rotatedOffset = transform.InverseTransformDirection(createPos);
         Vector3 buttonPos = new Vector3(rotatedOffset.x, rotatedOffset.y - 1, rotatedOffset.z);
@@ -373,7 +388,7 @@ public class MiniMapManager : MonoBehaviour
         for (int i = 0; i < transform.childCount; i++)
         {
             GameObject childNode = transform.GetChild(i).gameObject;
-            TileType childNodeType = childNode.GetComponent<TileNode>().type;
+            TileType childNodeType = childNode.GetComponent<TileNodeController>().Type;
             if (childNodeType == TileType.Road)
             {
                 continue;
@@ -405,7 +420,7 @@ public class MiniMapManager : MonoBehaviour
     {
         for (int i = 0; i < transform.childCount; i++)
         {
-            if (transform.GetChild(i).GetComponent<TileNode>().type == TileType.Road)
+            if (transform.GetChild(i).GetComponent<TileNodeController>().Type == TileType.Road)
             {
                 continue;
             }
@@ -454,7 +469,60 @@ public class MiniMapManager : MonoBehaviour
         {
             for(int j=0; j<tileNodes.GetLength(1); j++)
             {
-                tileNodes[i, j].globalIndex = new Vector2Int(startIndex.x + j, startIndex.y - i);
+                miniMapInfo.TileNodes[i, j].globalIndex = new Vector2Int(startIndex.x + j, startIndex.y - i);
+            }
+        }
+    }
+
+    void Rotate4(TileNode a, TileNode b, TileNode c, TileNode d)
+    {
+        TileType tempType = a.type;
+        float tempHeight = a.height;
+
+        a.type = b.type;
+        a.height = b.height;
+
+        b.type = c.type;
+        b.height = c.height;
+
+        c.type = d.type;
+        c.height = d.height;
+
+        d.type = tempType;
+        d.height = tempHeight;
+    }
+
+    public void RotateTileData(int rotateNum)
+    {
+        int size = tileNodes.GetLength(0);
+        //Debug.Log("rotateCount : " + rotateNum);
+        for(int rc = 0; rc< rotateNum; rc++)
+        {
+            for(int layer = 0; layer<size/2; layer++)
+            {
+                int first = layer;
+                int last = size - 1 - layer;
+
+                for(int i=first; i<last; i++)
+                {
+                    int offset = i - first;
+
+                    Rotate4(miniMapInfo.TileNodes[first, i], miniMapInfo.TileNodes[last - offset, first], miniMapInfo.TileNodes[last, last - offset], miniMapInfo.TileNodes[i, last]);
+                }
+            }
+        }
+    }
+
+    // 임시로 확인용 코드
+    public void TempPrint()
+    {
+        for (int i = 0; i < indexSize; i++)
+        {
+            for (int j = 0; j < indexSize; j++)
+            {
+                Debug.Log($"tileNodes[{i},{j}].type = {(TileType)miniMapInfo.TileNodes[i, j].type}");
+                Debug.Log($"tileNodes[{i},{j}].globalIndex = {miniMapInfo.TileNodes[i, j].globalIndex}");
+                Debug.Log($"tileNodes[{i},{j}].height = {miniMapInfo.TileNodes[i, j].height}");
             }
         }
     }

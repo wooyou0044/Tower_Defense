@@ -20,6 +20,10 @@ public class BuildManager : MonoBehaviour
     Camera cam;
     TowerController towerCtrl;
     Vector2Int towerSize;
+    TileNode chooseTile;
+    TileNode prevTile;
+
+    MiniMapManager tempMgr;
 
     static public BuildManager Instance
     {
@@ -172,16 +176,32 @@ public class BuildManager : MonoBehaviour
         if(Physics.Raycast(ray, out hit, 300f, buildLayer))
         {
             // 타워의 크기만큼 계산했을 때 건설할 수 있는 곳인지 확인하고 가능하면 타워 -> 초록색, 아니면 타워 -> 빨간색으로 표시, x표시 나오기
-            TileNode node = hit.transform.GetComponent<TileNode>();
-            if(node.installedTower != null)
+            TileNodeController nodeCtrl = hit.transform.GetComponent<TileNodeController>();
+            chooseTile = nodeCtrl.FindClosestTile(hit.point);
+            if (chooseTile.installedTower == null)
             {
-
+                if(tempMgr == null)
+                {
+                    tempMgr = nodeCtrl.GetComponentInParent<MiniMapManager>();
+                    //tempMgr.Temp(chooseTile);
+                }
+                Debug.Log("높이 : " + chooseTile.height);
+                Debug.Log("globalIndex : " + chooseTile.globalIndex);
             }
-            else
-            {
-                towerCtrl.ChangeMatCanBuild(false);
-                uiMgr.SetCanNotBuildIconPos(mousePosition);
-            }
+            //if (node.installedTower == null)
+            //{
+            //    if (minimapMgr == null)
+            //    {
+            //        minimapMgr = nodeCtrl.GetComponentInParent<MiniMapManager>();
+            //    }
+            //    minimapMgr.SetTileIdxInChooseMinimap(node);
+            //    // 마우스 위치와 가장 가까운 타일 구하기
+            //}
+            //else
+            //{
+            //    towerCtrl.ChangeMatCanBuild(false);
+            //    uiMgr.SetCanNotBuildIconPos(mousePosition);
+            //}
         }
         else
         {

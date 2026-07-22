@@ -36,6 +36,7 @@ public class MapManager : MonoBehaviour
     bool isMapChange = false;
     int minimapSize;
     float roadPosY;
+    int rotateCount;
 
     public GameObject newMinimap { get; private set; }
 
@@ -107,7 +108,7 @@ public class MapManager : MonoBehaviour
                 minimapSize = newMiniNode.GetSize();
             }
 
-            int rotateCount = 0;
+            rotateCount = 0;
             while (rotateCount < (int)Direction.None)
             {
                 if (minimapMgr.miniMapInfo.RoadEdges.Contains(connectRoadDir))
@@ -139,25 +140,30 @@ public class MapManager : MonoBehaviour
             dicMiniMaps.Add(newMiniMapPos, newMiniNode);
 
             // 회전하면 판정
-            ResetMinimapWorldPosition(minimapMgr);
+            ResetMinimapTileNode(minimapMgr);
 
             // 미니맵 버튼 생성
             MakeCreateMinimapButton(newMinimap, connectRoadDir);
 
-            Debug.Log("미니맵 : " + newMinimap);
+            //Debug.Log("미니맵 : " + newMinimap);
             // 미니맵의 타일들 GlobalIndex 세팅하기
             minimapMgr.SetGlobalIndex(centMinimapMgr.miniMapInfo, direction);
+
+            // 임시 Debug 확인
+            //minimapMgr.TempPrint();
 
             newMinimap = null;
         }
 
         dicTotalEnemyPath = FindEnemyPath();
         Debug.Log("totalEnemyPathList.Count : " + dicTotalEnemyPath.Count);
+
+        rotateCount = 0;
     }
 
     public void ExamineRotate(MiniMapManager mapMgr)
     {
-        Debug.Log("Rotate 함수 호출됨");
+        //Debug.Log("Rotate 함수 호출됨");
         mapMgr.RotateRoadEdgesClockWise();
         mapMgr.gameObject.transform.Rotate(Vector3.up, 90);
     }
@@ -271,6 +277,13 @@ public class MapManager : MonoBehaviour
 
     public void RotateNewMinimap(Direction dir)
     {
+        //Debug.Log("이전 rotateCount : " + rotateCount);
+        rotateCount++;
+        if(rotateCount >= 4)
+        {
+            rotateCount = 0;
+        }
+        //Debug.Log("클릭 후 rotateCount : " + rotateCount);
         ExamineRotate(minimapMgr);
         UpdateMaterialConnection();
     }
@@ -307,7 +320,6 @@ public class MapManager : MonoBehaviour
         node.CurrentPos = newMinimap.transform.position;
 
         MiniMapManager mapMgr = newMinimap.GetComponent<MiniMapManager>();
-        ResetMinimapWorldPosition(mapMgr);
 
         // 생성한 랜덤맵
         dicMiniMaps.Add(newMiniMapPos, node);
@@ -315,6 +327,7 @@ public class MapManager : MonoBehaviour
 
         NewMinimapInstalled(node);
 
+        ResetMinimapTileNode(mapMgr);
         // 미니맵의 tileNode GlobalIndex 지정
         Direction neighborMapDirect = mapSpawnStruct.connectDireciton;
         MinimapNode neighborNode = GetNeighborMinimapNode(neighborMapDirect, node);
@@ -323,6 +336,8 @@ public class MapManager : MonoBehaviour
         {
             mapMgr.SetGlobalIndex(neighborNode, neighborMapDirect);
         }
+
+        minimapMgr.TempPrint();
 
         minimapMgr.ResetOriginMaterial();
 
@@ -339,6 +354,8 @@ public class MapManager : MonoBehaviour
         // Reroll Zone 버튼 UI 지우기
         uiMgr.SetDeactiveRerollPanel();
         uiMgr.SetBuildMapActive(true);
+
+        rotateCount = 0;
     }
 
     MinimapNode GetNeighborMinimapNode(Direction neighborDir, MinimapNode newMinimapNode)
@@ -354,9 +371,10 @@ public class MapManager : MonoBehaviour
         return null;
     }
 
-    void ResetMinimapWorldPosition(MiniMapManager mapMgr)
+    void ResetMinimapTileNode(MiniMapManager mapMgr)
     {
         int indexSize = mapMgr.miniMapInfo.TileNodes.GetLength(0);
+        mapMgr.RotateTileData(rotateCount);
         for (int i = 0; i < indexSize; i++)
         {
             for (int j = 0; j < indexSize; j++)
@@ -424,6 +442,7 @@ public class MapManager : MonoBehaviour
             uiMgr.SetRerollMapBtn(false);
             return;
         }
+        rotateCount = 0;
         uiMgr.SetRerollMapBtn(true);
 
         Destroy(newMinimap);
@@ -527,7 +546,7 @@ public class MapManager : MonoBehaviour
         List<MinimapNode> connectedMinimaps = CollectConnctedMinimaps(newMapPos);
         List<Vector3> allRoads = new List<Vector3>();
 
-        Debug.Log("connectedMinimaps.Count : " + connectedMinimaps.Count);
+        //Debug.Log("connectedMinimaps.Count : " + connectedMinimaps.Count);
         foreach(var miniMap in connectedMinimaps)
         {
             allRoads.AddRange(miniMap.GetRoadWorldPositions());
@@ -537,7 +556,7 @@ public class MapManager : MonoBehaviour
         List<MinimapNode> connectRoadNeighbors = GetConnectRoadNeighbors(miniNode);
         List<Vector3> matchSpawns = new List<Vector3>();
 
-        Debug.Log("connectRoadNeighbors : " + connectRoadNeighbors.Count);
+        //Debug.Log("connectRoadNeighbors : " + connectRoadNeighbors.Count);
 
         foreach (var neighborNode in connectRoadNeighbors)
         {
@@ -570,7 +589,7 @@ public class MapManager : MonoBehaviour
                     if (newNeighborPath != null && newNeighborPath.Count > 0)
                     {
                         candidates = FindAllCandidatePathsDFS(neighborSpawn, centralPos, allNeighborRoads);
-                        Debug.Log("neighbor Candidates.Count : " + candidates.Count);
+                        //Debug.Log("neighbor Candidates.Count : " + candidates.Count);
                         //candidates.RemoveAll(pathCandidate => IsPathSame(pathCandidate, newNeighborPath));
                         //RemoveShortPathFromCandidates(candidates, newNeighborPath);
                         dicTotalEnemyPath[neighborSpawn] = new EnemyPathInfo(neighborSpawn, centralPos, newNeighborPath, candidates);
