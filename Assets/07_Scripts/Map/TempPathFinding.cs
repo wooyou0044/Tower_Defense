@@ -48,6 +48,7 @@ public class TempPathFinding : MonoBehaviour
         }
         if(Input.GetMouseButtonDown(1))
         {
+            Debug.Log("오른쪽 마우스 입력 -> 맵 회전");
             ExamineRotate(minimapMgr);
             path = new PathFinding(minimapMgr.miniMapInfo.TileNodes);
             pathList = path.FindPath();

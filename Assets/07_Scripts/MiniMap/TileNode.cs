@@ -13,11 +13,11 @@ public class TileNode
 {
     public TileType type { get; set; }
 
-    public float height { get; set; }
-    public Vector3 worldPosition { get; set; }
+    public float height;
+    public Vector3 worldPosition;
 
-    public Vector2Int globalIndex { get; set; }
-    public TowerController installedTower { get; set; }
+    public Vector2Int globalIndex;
+    public TowerController installedTower;
 
     public float gridSize
     {
