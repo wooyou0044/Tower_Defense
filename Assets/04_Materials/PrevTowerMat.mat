@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CanBuildTowerMat
+  m_Name: PrevTowerMat
   m_Shader: {fileID: -6465566751694194690, guid: a4e69a74f5fc4834884e985697335b2d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -114,7 +114,6 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _Transparency: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
     - _isBuildMinimap: 0
@@ -125,7 +124,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &8546014240496242205
+--- !u!114 &4815551945957964336
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

@@ -1712,7 +1712,7 @@ MonoBehaviour:
   uiMgr: {fileID: 184898864}
   initRndTowerNum: 5
   buildTowerTrans: {fileID: 1269845303}
-  previewTowerMat: {fileID: 2100000, guid: a5165c570e3fd4240af04eb1d728378e, type: 2}
+  previewTowerMat: {fileID: 2100000, guid: 67dbf8a9ca5b51145ab6643e8c1fe2f8, type: 2}
 --- !u!4 &415186253
 Transform:
   m_ObjectHideFlags: 0

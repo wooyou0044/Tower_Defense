@@ -59,9 +59,7 @@ public class UIManager : MonoBehaviour
         isRerollBtnActive = true;
 
         // 임시로 시작할 때 빌드 버튼 안 생기게 만들기
-        towerBtnCtrlList = new List<BuildBtnController>();
-        MakeTowerBtn();
-        SetBuildMapActive(false);
+        //SetBuildMapActive(false);
         canNotBuildIcon.gameObject.SetActive(false);
 
         // 이벤트 구독
@@ -154,11 +152,11 @@ public class UIManager : MonoBehaviour
         rerollMapCoinTxt.text = rerollCoin.ToString();
     }
 
-    void MakeTowerBtn()
+    public void MakeInitTowerBtn(List<DefTower> towerList)
     {
-        List<DefTower> towerList = new List<DefTower>();
-        towerList = BuildManager.Instance.MakeInitRndTowerPack();
-        for(int i=0; i<towerList.Count; i++)
+        towerBtnCtrlList = new List<BuildBtnController>();
+
+        for (int i=0; i<towerList.Count; i++)
         {
             //GameObject towerBtn = Instantiate(buildBtnPrefab, buildBtnGridArea);
             //BuildBtnController btnCtrl = towerBtn.GetComponent<BuildBtnController>();
@@ -214,7 +212,7 @@ public class UIManager : MonoBehaviour
         {
             SetCanNotBuildIconActive(true);
         }
-        canNotBuildIcon.transform.position = pos + new Vector3(20, 30, 0);
+        canNotBuildIcon.transform.position = pos + new Vector3(70, 30, 0);
     }
 
     void ChangeRewardPanel()

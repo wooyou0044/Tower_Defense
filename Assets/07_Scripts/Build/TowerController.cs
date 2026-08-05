@@ -67,6 +67,7 @@ public class TowerController : MonoBehaviour
         int width = Mathf.RoundToInt(size.x / tileSize);
         int height = Mathf.RoundToInt(size.z / tileSize);
         towerNodeSize = new Vector2Int(width, height);
+        Debug.Log("처음 만들어진 타워 사이즈 : " + towerNodeSize);
         return towerNodeSize;
     }
 

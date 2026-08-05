@@ -20,6 +20,8 @@ public class BuildManager : MonoBehaviour
     Camera cam;
     TowerController towerCtrl;
     Vector2Int towerSize;
+    List<DefTower> initRndTowerList;
+    TileNodeController hitTileNodeCtrl;
 
     static public BuildManager Instance
     {
@@ -40,8 +42,9 @@ public class BuildManager : MonoBehaviour
 
     void Start()
     {
-        //InitiateDefTower();
-        dicTowerObject = new Dictionary<int, GameObject>();
+        MakeInitRndTowerPack();
+        InitiateDefTower();
+        //prevTower = null;
     }
 
     void Update()
@@ -62,24 +65,38 @@ public class BuildManager : MonoBehaviour
     void InitiateDefTower()
     {
         dicTowerObject = new Dictionary<int, GameObject>();
-        for(int i=0; i<towerSO.Length; i++)
+        //for(int i=0; i<towerSO.Length; i++)
+        //{
+        //    GameObject prevTower = MakePrevTower(towerSO[i].defTowerObject);
+        //    dicTowerObject.Add(towerSO[i].towerID, prevTower);
+        //    towerCtrl = prevTower.GetComponent<TowerController>();
+        //    towerCtrl.ChangeTowerMaterial(previewTowerMat);
+        //    prevTower.SetActive(false);
+        //}
+
+        for (int i = 0; i < initRndTowerList.Count; i++)
         {
-            GameObject prevTower = MakePrevTower(towerSO[i].defTowerObject);
-            dicTowerObject.Add(towerSO[i].towerID, prevTower);
+            GameObject prevTower = MakePrevTower(initRndTowerList[i].defTowerObject);
+            dicTowerObject.Add(initRndTowerList[i].towerID, prevTower);
+            towerCtrl = prevTower.GetComponent<TowerController>();
+            towerCtrl.ChangeTowerMaterial(previewTowerMat);
             prevTower.SetActive(false);
         }
+
+        uiMgr.MakeInitTowerBtn(initRndTowerList);
+        uiMgr.SetBuildMapActive(false);
     }
 
-    public GameObject MakePrevTower(GameObject towerPrefab)
+    GameObject MakePrevTower(GameObject towerPrefab)
     {
         GameObject prevTowerObj = Instantiate(towerPrefab, buildTowerTrans);
         prevTowerObj.transform.position = Input.mousePosition;
         return prevTowerObj;
     }
     
-    public List<DefTower> MakeInitRndTowerPack()
+    List<DefTower> MakeInitRndTowerPack()
     {
-        List<DefTower> defTowerList = new List<DefTower>();
+        initRndTowerList = new List<DefTower>();
         Dictionary<int, DefTower> dupCheckDefTower = new Dictionary<int, DefTower>();
         for(int i=0; i<initRndTowerNum; i++)
         {
@@ -96,8 +113,8 @@ public class BuildManager : MonoBehaviour
             }
         }
         //defTowerList = new List<DefTower>(dupCheckDefTower.Values);
-        defTowerList = dupCheckDefTower.Values.ToList();
-        return defTowerList;
+        initRndTowerList = dupCheckDefTower.Values.ToList();
+        return initRndTowerList;
     }
 
     //public void MakeTowerID(DefTower tower)
@@ -108,6 +125,11 @@ public class BuildManager : MonoBehaviour
 
     public void SetActiveTowerPrefab(DefTower tower)
     {
+        if(tower == prevTower)
+        {
+            Debug.Log("prevTower 없음");
+            return;
+        }
         if(prevTower != null)
         {
             prevTower.SetActive(false);
@@ -128,27 +150,29 @@ public class BuildManager : MonoBehaviour
         {
             dicTowerObject[towerID].SetActive(true);
         }
-        else
-        {
-            GameObject makeTower = null;
-            for(int i=0; i<towerSO.Length; i++)
-            {
-                if(towerSO[i].towerID == tower.towerID)
-                {
-                    makeTower = towerSO[i].defTowerObject;
-                    break;
-                }
-            }
-            GameObject towerObj = MakePrevTower(makeTower);
-            dicTowerObject.Add(tower.towerID, towerObj);
-            towerCtrl = towerObj.GetComponent<TowerController>();
-            towerCtrl.ChangeTowerMaterial(previewTowerMat);
-        }
         //dicTowerObject[towerID].SetActive(true);
         prevTower = dicTowerObject[towerID];
         prevTowerID = towerID;
         towerCtrl = prevTower.GetComponent<TowerController>();
         towerSize = towerCtrl.GetSize;
+    }
+
+    public void MakeNewTower(DefTower tower)
+    {
+        GameObject makeTower = null;
+        for (int i = 0; i < towerSO.Length; i++)
+        {
+            if (towerSO[i].towerID == tower.towerID)
+            {
+                makeTower = towerSO[i].defTowerObject;
+                break;
+            }
+        }
+
+        GameObject towerObj = MakePrevTower(makeTower);
+        dicTowerObject.Add(tower.towerID, towerObj);
+        towerCtrl = towerObj.GetComponent<TowerController>();
+        towerCtrl.ChangeTowerMaterial(previewTowerMat);
     }
 
     void UpdateTowerPlace(GameObject towerObj)
@@ -172,16 +196,7 @@ public class BuildManager : MonoBehaviour
         if(Physics.Raycast(ray, out hit, 300f, buildLayer))
         {
             // 타워의 크기만큼 계산했을 때 건설할 수 있는 곳인지 확인하고 가능하면 타워 -> 초록색, 아니면 타워 -> 빨간색으로 표시, x표시 나오기
-            TileNode node = hit.transform.GetComponent<TileNode>();
-            if(node.installedTower != null)
-            {
-
-            }
-            else
-            {
-                towerCtrl.ChangeMatCanBuild(false);
-                uiMgr.SetCanNotBuildIconPos(mousePosition);
-            }
+            hitTileNodeCtrl = hit.transform.GetComponent<TileNodeController>();
         }
         else
         {

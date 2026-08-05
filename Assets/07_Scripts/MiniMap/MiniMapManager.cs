@@ -58,26 +58,24 @@ public class MiniMapManager : MonoBehaviour
 
         foreach (Transform child in transform)
         {
-            TileNode node = child.GetComponent<TileNode>();
-            if (node == null)
+            TileNodeController nodeCtrl = child.GetComponent<TileNodeController>();
+            if (nodeCtrl == null)
             {
-                Debug.Log(node.gameObject);
+                Debug.Log(nodeCtrl.gameObject);
                 continue;
             }
             Vector3 pos = child.localPosition;
             pos.x += 8f;
             pos.z -= 8f;
             Vector3 scale = child.localScale;
-            Vector3 lsyScale = child.lossyScale;
 
-            int width = Mathf.FloorToInt(scale.x / node.gridSize);
-            int height = Mathf.FloorToInt(scale.z / node.gridSize);
+            int width = Mathf.FloorToInt(scale.x / nodeCtrl.gridSize);
+            int height = Mathf.FloorToInt(scale.z / nodeCtrl.gridSize);
 
             int gridPosX = 0;
             int gridPosZ = 0;
             int baseX;
             int baseZ;
-            float topY;
 
             if (width == indexSize)
             {
@@ -92,12 +90,10 @@ public class MiniMapManager : MonoBehaviour
                     for (int j = 0; j < width; j++)
                     {
                         int z = baseZ + i;
-                        tileNodes[z, j].type = node.type;
+                        tileNodes[z, j].type = nodeCtrl.Type;
                         //tileNodes[z, j] = new TileNode(node.type);
-                        //tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
-                        topY = pos.y + (lsyScale.y * 0.5f);
-                        tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, topY);
-                        if (node.type == TileType.Road || tileNodes[z, j].height > ExamineHeight(pos.y, scale.y))
+                        tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
+                        if (nodeCtrl.Type == TileType.Road || tileNodes[z, j].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
@@ -115,12 +111,10 @@ public class MiniMapManager : MonoBehaviour
                     for (int j = 0; j < width; j++)
                     {
                         int x = baseX + j;
-                        tileNodes[i, x].type = node.type;
+                        tileNodes[i, x].type = nodeCtrl.Type;
                         //tileNodes[i, x] = new TileNode(node.type);
-                        //tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
-                        topY = pos.y + (lsyScale.y * 0.5f);
-                        tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, topY);
-                        if (node.type == TileType.Road || tileNodes[i, x].height > ExamineHeight(pos.y, scale.y))
+                        tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
+                        if (nodeCtrl.Type == TileType.Road || tileNodes[i, x].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
@@ -226,12 +220,10 @@ public class MiniMapManager : MonoBehaviour
                     int x = baseX + j;
                     if (x >= 0 && x < indexSize && z >= 0 && z < indexSize)
                     {
-                        tileNodes[z, x].type = node.type;
+                        tileNodes[z, x].type = nodeCtrl.Type;
                         //Vector3 centerOffset = new Vector3((x - indexSize / 2) * 4, pos.y, (indexSize / 2 - z) * 4);
-                        //tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
-                        topY = pos.y + (lsyScale.y * 0.5f);
-                        tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, topY);
-                        if (node.type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
+                        tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
+                        if (nodeCtrl.Type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
@@ -373,7 +365,7 @@ public class MiniMapManager : MonoBehaviour
         for (int i = 0; i < transform.childCount; i++)
         {
             GameObject childNode = transform.GetChild(i).gameObject;
-            TileType childNodeType = childNode.GetComponent<TileNode>().type;
+            TileType childNodeType = childNode.GetComponent<TileNodeController>().Type;
             if (childNodeType == TileType.Road)
             {
                 continue;
@@ -405,7 +397,7 @@ public class MiniMapManager : MonoBehaviour
     {
         for (int i = 0; i < transform.childCount; i++)
         {
-            if (transform.GetChild(i).GetComponent<TileNode>().type == TileType.Road)
+            if (transform.GetChild(i).GetComponent<TileNodeController>().Type == TileType.Road)
             {
                 continue;
             }
@@ -414,9 +406,9 @@ public class MiniMapManager : MonoBehaviour
         }
     }
 
-    public Vector3 SetTileNodeWorldPosition(int posX, int posZ, Transform minimapTrans, float topY)
+    public Vector3 SetTileNodeWorldPosition(int posX, int posZ, Transform minimapTrans, float roadPosY)
     {
-        Vector3 localOffset = new Vector3((posX - indexSize / 2) * 4, topY, (indexSize / 2 - posZ) * 4);
+        Vector3 localOffset = new Vector3((posX - indexSize / 2) * 4, roadPosY, (indexSize / 2 - posZ) * 4);
         Vector3 worldPos = minimapTrans.TransformPoint(localOffset);
         //worldPos.y = roadPosY;
         return worldPos;

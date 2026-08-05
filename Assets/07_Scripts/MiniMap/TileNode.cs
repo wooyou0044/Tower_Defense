@@ -9,9 +9,9 @@ public enum TileType
     Buildable
 }
 
-public class TileNode : MonoBehaviour
+public class TileNode
 {
-    public TileType type;
+    public TileType type { get; set; }
 
     public float height { get; set; }
     public Vector3 worldPosition { get; set; }
@@ -23,7 +23,7 @@ public class TileNode : MonoBehaviour
     {
         get
         {
-            if(type == TileType.Buildable)
+            if (type == TileType.Buildable)
             {
                 return 4;
             }
