@@ -450,4 +450,48 @@ public class MiniMapManager : MonoBehaviour
             }
         }
     }
+
+    public void TempPrint()
+    {
+        for(int i=0; i<miniMapInfo.TileNodes.GetLength(0); i++)
+        {
+            for(int j=0; j<miniMapInfo.TileNodes.GetLength(1); j++)
+            {
+                Debug.Log($"tileNodes[{i},{j}].Type = {miniMapInfo.TileNodes[i, j].type}");
+                Debug.Log($"tileNodes[{i},{j}].globalIndex = {miniMapInfo.TileNodes[i, j].globalIndex}");
+                Debug.Log($"tileNodes[{i},{j}].height = {miniMapInfo.TileNodes[i, j].height}");
+            }
+        }
+    }
+
+    void Rotate4<T>(ref T a, ref T b, ref T c, ref T d)
+    {
+        T temp = a;
+        a = b;
+        b = c;
+        c = d;
+        d = temp;
+    }
+
+    public void RotateTileData(int rotateCount)
+    {
+        Debug.Log("È¸Àü È½¼ö : " + rotateCount);
+        int size = miniMapInfo.TileNodes.GetLength(0);
+
+        for(int rc = 0; rc<rotateCount; rc++)
+        {
+            for(int layer = 0; layer<size/2; layer++)
+            {
+                int first = layer;
+                int last = size - 1 - layer;
+
+                for(int i=first; i<last; i++)
+                {
+                    int offset = i - first;
+
+                    Rotate4(ref miniMapInfo.TileNodes[first, i], ref miniMapInfo.TileNodes[last - offset, first], ref miniMapInfo.TileNodes[last, last - offset], ref miniMapInfo.TileNodes[i, last]);
+                }
+            }
+        }
+    }
 }

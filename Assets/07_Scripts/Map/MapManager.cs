@@ -145,12 +145,14 @@ public class MapManager : MonoBehaviour
             // 미니맵 버튼 생성
             MakeCreateMinimapButton(newMinimap, connectRoadDir);
 
+            minimapMgr.RotateTileData(rotateCount);
+
             //Debug.Log("미니맵 : " + newMinimap);
             // 미니맵의 타일들 GlobalIndex 세팅하기
             minimapMgr.SetGlobalIndex(centMinimapMgr.miniMapInfo, direction);
 
             // 임시 Debug 확인
-            //minimapMgr.TempPrint();
+            minimapMgr.TempPrint();
 
             newMinimap = null;
         }
@@ -329,6 +331,8 @@ public class MapManager : MonoBehaviour
 
         NewMinimapInstalled(node);
 
+        mapMgr.RotateTileData(rotateCount);
+
         // 미니맵의 tileNode GlobalIndex 지정
         Direction neighborMapDirect = mapSpawnStruct.connectDireciton;
         MinimapNode neighborNode = GetNeighborMinimapNode(neighborMapDirect, node);
@@ -338,7 +342,7 @@ public class MapManager : MonoBehaviour
             mapMgr.SetGlobalIndex(neighborNode, neighborMapDirect);
         }
 
-        //minimapMgr.TempPrint();
+        minimapMgr.TempPrint();
 
         minimapMgr.ResetOriginMaterial();
 
