@@ -133,6 +133,7 @@ public class BuildManager : MonoBehaviour
         if(prevTower != null)
         {
             prevTower.SetActive(false);
+            uiMgr.SetCanNotBuildIconActive(false);
         }
 
         if (tower.towerID == prevTowerID)

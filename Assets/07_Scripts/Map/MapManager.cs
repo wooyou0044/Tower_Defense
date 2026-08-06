@@ -325,9 +325,10 @@ public class MapManager : MonoBehaviour
         dicMiniMaps.Add(newMiniMapPos, node);
         Debug.Log("Dictionary 개수 : " + dicMiniMaps.Count);
 
+        ResetMinimapTileNode(mapMgr);
+
         NewMinimapInstalled(node);
 
-        ResetMinimapTileNode(mapMgr);
         // 미니맵의 tileNode GlobalIndex 지정
         Direction neighborMapDirect = mapSpawnStruct.connectDireciton;
         MinimapNode neighborNode = GetNeighborMinimapNode(neighborMapDirect, node);
@@ -337,7 +338,7 @@ public class MapManager : MonoBehaviour
             mapMgr.SetGlobalIndex(neighborNode, neighborMapDirect);
         }
 
-        minimapMgr.TempPrint();
+        //minimapMgr.TempPrint();
 
         minimapMgr.ResetOriginMaterial();
 
@@ -374,7 +375,7 @@ public class MapManager : MonoBehaviour
     void ResetMinimapTileNode(MiniMapManager mapMgr)
     {
         int indexSize = mapMgr.miniMapInfo.TileNodes.GetLength(0);
-        mapMgr.RotateTileData(rotateCount);
+        //mapMgr.RotateTileData(rotateCount);
         for (int i = 0; i < indexSize; i++)
         {
             for (int j = 0; j < indexSize; j++)
