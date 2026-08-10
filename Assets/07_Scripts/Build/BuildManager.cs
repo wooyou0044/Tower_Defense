@@ -21,7 +21,10 @@ public class BuildManager : MonoBehaviour
     TowerController towerCtrl;
     Vector2Int towerSize;
     List<DefTower> initRndTowerList;
-    TileNodeController hitTileNodeCtrl;
+    MiniMapManager hitMinimapMgr;
+
+    Vector2Int hitGridIndex;
+    float hitHeight;
 
     static public BuildManager Instance
     {
@@ -59,6 +62,10 @@ public class BuildManager : MonoBehaviour
         {
             // 들고 있는 타워 회전
             RotatePrevTower();
+        }
+        if(Input.GetMouseButtonDown(0))
+        {
+
         }
     }
 
@@ -197,7 +204,19 @@ public class BuildManager : MonoBehaviour
         if(Physics.Raycast(ray, out hit, 300f, buildLayer))
         {
             // 타워의 크기만큼 계산했을 때 건설할 수 있는 곳인지 확인하고 가능하면 타워 -> 초록색, 아니면 타워 -> 빨간색으로 표시, x표시 나오기
-            hitTileNodeCtrl = hit.transform.GetComponent<TileNodeController>();
+            //hitTileNodeCtrl = hit.transform.GetComponent<TileNodeController>();
+            hitMinimapMgr = hit.transform.GetComponentInParent<MiniMapManager>();
+            if(hitMinimapMgr != null)
+            {
+                hitGridIndex = hitMinimapMgr.WorldToGridIndex(hit.point);
+                Debug.Log("맞은 타일의 인덱스 위치 : " + hitGridIndex);
+                hitHeight = hitMinimapMgr.miniMapInfo.TileNodes[hitGridIndex.y, hitGridIndex.x].height;
+                Debug.Log("맞은 타일의 높이 : " + hitHeight);
+                if (hitHeight > 0)
+                {
+
+                }
+            }
         }
         else
         {

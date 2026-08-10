@@ -14,6 +14,7 @@ public class MiniMapManager : MonoBehaviour
 
     List<Material> canBuildMats;
     Material originMat;
+    float buildGridSize;
 
     public MinimapNode miniMapInfo { get; private set; }
     public int GetGridSize
@@ -236,7 +237,6 @@ public class MiniMapManager : MonoBehaviour
 
         // 길이 있는 면 확인
         miniMapInfo.RoadEdges = ExamineRoadSide(tileNodes);
-
         //for (int i = 0; i < indexSize; i++)
         //{
         //    for (int j = 0; j < indexSize; j++)
@@ -447,6 +447,10 @@ public class MiniMapManager : MonoBehaviour
             for(int j=0; j<tileNodes.GetLength(1); j++)
             {
                 tileNodes[i, j].globalIndex = new Vector2Int(startIndex.x + j, startIndex.y - i);
+                if(buildGridSize <= 0 && tileNodes[i,j].type == TileType.Buildable)
+                {
+                    buildGridSize = tileNodes[i, j].gridSize;
+                }
             }
         }
     }
@@ -493,5 +497,20 @@ public class MiniMapManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public Vector2Int WorldToGridIndex(Vector3 hitPos)
+    {
+        //Vector3 localPos = transform.InverseTransformPoint(hitPos);
+        Vector3 center = transform.position;
+        float mapHalfSize = (indexSize * buildGridSize) * 0.5f;
+
+        int x = Mathf.FloorToInt((hitPos.x - (center.x - mapHalfSize)) / buildGridSize);
+        int z = Mathf.FloorToInt(((center.z + mapHalfSize) - hitPos.z) / buildGridSize);
+
+        x = Mathf.Clamp(x, 0, indexSize - 1);
+        z = Mathf.Clamp(z, 0, indexSize - 1);
+
+        return new Vector2Int(x, z);
     }
 }
