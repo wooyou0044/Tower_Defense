@@ -15,16 +15,18 @@ public class BuildManager : MonoBehaviour
 
     GameObject prevTower;
     int prevTowerID;
+    int rotateCount;
 
     Dictionary<int, GameObject> dicTowerObject;
+    Dictionary<Vector2Int, TileNode> dicGlobalTileNode;
     Camera cam;
     TowerController towerCtrl;
-    Vector2Int towerSize;
     List<DefTower> initRndTowerList;
     MiniMapManager hitMinimapMgr;
 
     Vector2Int hitGridIndex;
-    float hitHeight;
+    Vector2Int anchorStartOffset;
+    //TileNode prevHitTileNode;
 
     static public BuildManager Instance
     {
@@ -41,6 +43,8 @@ public class BuildManager : MonoBehaviour
             _instance = this;
         }
         cam = Camera.main;
+
+        dicGlobalTileNode = new Dictionary<Vector2Int, TileNode>();
     }
 
     void Start()
@@ -56,14 +60,23 @@ public class BuildManager : MonoBehaviour
         {
             return;
         }
-        UpdateTowerPlace(prevTower);
 
-        if(Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))
         {
+            rotateCount++;
+            if (rotateCount > 3)
+            {
+                rotateCount = 0;
+            }
             // 들고 있는 타워 회전
             RotatePrevTower();
         }
-        if(Input.GetMouseButtonDown(0))
+
+        //UpdateTowerPlace(prevTower);
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = 10f;
+        GetTowerSizeTileType(prevTower, mousePos);
+        if (Input.GetMouseButtonDown(0))
         {
 
         }
@@ -86,6 +99,7 @@ public class BuildManager : MonoBehaviour
             GameObject prevTower = MakePrevTower(initRndTowerList[i].defTowerObject);
             dicTowerObject.Add(initRndTowerList[i].towerID, prevTower);
             towerCtrl = prevTower.GetComponent<TowerController>();
+            towerCtrl.SetTowerInfo(initRndTowerList[i]);
             towerCtrl.ChangeTowerMaterial(previewTowerMat);
             prevTower.SetActive(false);
         }
@@ -139,16 +153,19 @@ public class BuildManager : MonoBehaviour
         }
         if(prevTower != null)
         {
+            // 회전되어 있으면 원래대로 돌려놓기
+            prevTower.transform.rotation = Quaternion.identity;
             prevTower.SetActive(false);
             uiMgr.SetCanNotBuildIconActive(false);
         }
+
+        rotateCount = 0;
 
         if (tower.towerID == prevTowerID)
         {
             prevTower = null;
             prevTowerID = 0;
             towerCtrl = null;
-            towerSize = Vector2Int.zero;
             return;
         }
 
@@ -162,7 +179,6 @@ public class BuildManager : MonoBehaviour
         prevTower = dicTowerObject[towerID];
         prevTowerID = towerID;
         towerCtrl = prevTower.GetComponent<TowerController>();
-        towerSize = towerCtrl.GetSize;
     }
 
     public void MakeNewTower(DefTower tower)
@@ -183,21 +199,21 @@ public class BuildManager : MonoBehaviour
         towerCtrl.ChangeTowerMaterial(previewTowerMat);
     }
 
-    void UpdateTowerPlace(GameObject towerObj)
+    void UpdateTowerPlace(Vector3 mousePosition)
     {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 10f;
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-        prevTower.transform.position = worldPos;
-        if(towerCtrl == null)
+        //타워 위치 조정
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
+        Debug.Log("anchorStartOffset : " + anchorStartOffset);
+        prevTower.transform.position = worldPos + (new Vector3(anchorStartOffset.x, 0, anchorStartOffset.y)*3);
+    }
+
+    void GetTowerSizeTileType(GameObject towerObj, Vector3 mousePosition)
+    {
+        if (towerCtrl == null)
         {
             towerCtrl = towerObj.GetComponent<TowerController>();
         }
-        GetTowerSizeTileType(towerCtrl.GetSize, mousePos);
-    }
 
-    void GetTowerSizeTileType(Vector2Int size, Vector3 mousePosition)
-    {
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         int buildLayer = LayerMask.GetMask("Buildable");
@@ -206,15 +222,23 @@ public class BuildManager : MonoBehaviour
             // 타워의 크기만큼 계산했을 때 건설할 수 있는 곳인지 확인하고 가능하면 타워 -> 초록색, 아니면 타워 -> 빨간색으로 표시, x표시 나오기
             //hitTileNodeCtrl = hit.transform.GetComponent<TileNodeController>();
             hitMinimapMgr = hit.transform.GetComponentInParent<MiniMapManager>();
-            if(hitMinimapMgr != null)
+            hitGridIndex = hitMinimapMgr.WorldToGridIndex(hit.point);
+            TileNode hitTileNode = hitMinimapMgr.miniMapInfo.TileNodes[hitGridIndex.y, hitGridIndex.x];
+            anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
+            if (hitTileNode.height > 0 && hitTileNode.installedTower == null)
             {
-                hitGridIndex = hitMinimapMgr.WorldToGridIndex(hit.point);
-                Debug.Log("맞은 타일의 인덱스 위치 : " + hitGridIndex);
-                hitHeight = hitMinimapMgr.miniMapInfo.TileNodes[hitGridIndex.y, hitGridIndex.x].height;
-                Debug.Log("맞은 타일의 높이 : " + hitHeight);
-                if (hitHeight > 0)
+                //Debug.Log("맞은 타일의 globalIndex : " + prevHitTileNode.globalIndex);
+                if (CheckHeightByTowerSize(hitTileNode))
                 {
-
+                    //Debug.Log("건설 가능");
+                    towerCtrl.ChangeMatCanBuild(true);
+                    uiMgr.SetCanNotBuildIconActive(false);
+                }
+                else
+                {
+                    towerCtrl.ChangeMatCanBuild(false);
+                    uiMgr.SetCanNotBuildIconPos(mousePosition);
+                    Debug.Log("건설 불가능");
                 }
             }
         }
@@ -224,6 +248,46 @@ public class BuildManager : MonoBehaviour
             towerCtrl.ChangeMatCanBuild(false);
             uiMgr.SetCanNotBuildIconPos(mousePosition);
         }
+
+        UpdateTowerPlace(mousePosition);
+    }
+
+    bool CheckHeightByTowerSize(TileNode hitTileNode)
+    {
+        //Debug.Log("타워 사이즈 : " + towerCtrl.GetSize);
+        //타워 사이즈에 맞춰 1. 타워 타입이 Buildable인지 체크 2. installedTower가 있는지 확인 3. 높이가 같은지 체크
+        Vector2Int towerSize = towerCtrl.GetRotateTowerSize(rotateCount);
+        float hitTileHeight = hitTileNode.height;
+
+        Vector2Int startGlobalIdx = hitTileNode.globalIndex;
+        List<Vector2Int> footprintList = towerCtrl.SetCheckIdxOffset(anchorStartOffset);
+        foreach(Vector2Int offset in footprintList)
+        {
+            Vector2Int checkIdx = startGlobalIdx + offset;
+            if(!dicGlobalTileNode.TryGetValue(checkIdx, out TileNode checkTileNode))
+            {
+                return false;
+            }
+            else
+            {
+                if(checkTileNode.type != TileType.Buildable)
+                {
+                    Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].type = {checkTileNode.type}이라 오류");
+                    return false;
+                }
+                if(checkTileNode.installedTower != null)
+                {
+                    Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].installedTower = {checkTileNode.installedTower}이라 오류");
+                    return false;
+                }
+                if(checkTileNode.height != hitTileHeight)
+                {
+                    Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].heihgt = {checkTileNode.height}이라 오류");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     void RotatePrevTower()
@@ -232,10 +296,28 @@ public class BuildManager : MonoBehaviour
         {
             return;
         }
-        towerCtrl.GetIsRotate = !towerCtrl.GetIsRotate;
-        Debug.Log("towerSize : " + towerCtrl.GetSize);
+        //Debug.Log("towerSize : " + towerCtrl.GetSize);
         // 가지고 있는 타워 회전
         prevTower.transform.Rotate(Vector3.up, 90);
+    }
+
+    public void SetDicGlobalIndexTileNode(Vector2Int globalIndex, TileNode node)
+    {
+        if(dicGlobalTileNode.ContainsKey(globalIndex) == false)
+        {
+            dicGlobalTileNode.Add(globalIndex, node);
+        }
+        dicGlobalTileNode[globalIndex] = node;
+    }
+
+    public void TempPrint()
+    {
+        foreach(KeyValuePair<Vector2Int, TileNode> kvp in dicGlobalTileNode)
+        {
+            Debug.Log($"GlboalIndex({kvp.Key}).type = {kvp.Value.type}");
+            Debug.Log($"GlboalIndex({kvp.Key}).glboalIndex = {kvp.Value.globalIndex}");
+            Debug.Log($"GlboalIndex({kvp.Key}).height = {kvp.Value.height}");
+        }
     }
 
     // 임시로 꺼졌을 때 DefTower에 있는 Count 값이 초기화되게 만들기

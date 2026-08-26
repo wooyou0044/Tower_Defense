@@ -22,6 +22,11 @@ public class MiniMapManager : MonoBehaviour
         get => indexSize;
     }
 
+    public float GetBuildGridSize
+    {
+        get => buildGridSize;
+    }
+
     private void Awake()
     {
         miniMapInfo = new MinimapNode();
@@ -447,6 +452,7 @@ public class MiniMapManager : MonoBehaviour
             for(int j=0; j<tileNodes.GetLength(1); j++)
             {
                 tileNodes[i, j].globalIndex = new Vector2Int(startIndex.x + j, startIndex.y - i);
+                BuildManager.Instance.SetDicGlobalIndexTileNode(tileNodes[i, j].globalIndex, miniMapInfo.TileNodes[i, j]);
                 if(buildGridSize <= 0 && tileNodes[i,j].type == TileType.Buildable)
                 {
                     buildGridSize = tileNodes[i, j].gridSize;
@@ -457,15 +463,16 @@ public class MiniMapManager : MonoBehaviour
 
     public void TempPrint()
     {
-        for(int i=0; i<miniMapInfo.TileNodes.GetLength(0); i++)
-        {
-            for(int j=0; j<miniMapInfo.TileNodes.GetLength(1); j++)
-            {
-                Debug.Log($"tileNodes[{i},{j}].Type = {miniMapInfo.TileNodes[i, j].type}");
-                Debug.Log($"tileNodes[{i},{j}].globalIndex = {miniMapInfo.TileNodes[i, j].globalIndex}");
-                Debug.Log($"tileNodes[{i},{j}].height = {miniMapInfo.TileNodes[i, j].height}");
-            }
-        }
+        //for(int i=0; i<miniMapInfo.TileNodes.GetLength(0); i++)
+        //{
+        //    for(int j=0; j<miniMapInfo.TileNodes.GetLength(1); j++)
+        //    {
+        //        Debug.Log($"tileNodes[{i},{j}].Type = {miniMapInfo.TileNodes[i, j].type}");
+        //        Debug.Log($"tileNodes[{i},{j}].globalIndex = {miniMapInfo.TileNodes[i, j].globalIndex}");
+        //        Debug.Log($"tileNodes[{i},{j}].height = {miniMapInfo.TileNodes[i, j].height}");
+        //    }
+        //}
+        BuildManager.Instance.TempPrint();
     }
 
     void Rotate4<T>(ref T a, ref T b, ref T c, ref T d)

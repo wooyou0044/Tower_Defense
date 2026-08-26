@@ -9,7 +9,6 @@ public class TowerController : MonoBehaviour
     Collider footPrintCol;
     Vector2Int towerSize;
     bool isPrevMatChanged;
-    bool isRotate;
     MeshRenderer towerRend;
     Material originMat;
     Material newTowerMat;
@@ -17,30 +16,10 @@ public class TowerController : MonoBehaviour
 
     public DefTower MyTower { get => myTower; }
 
-    public Vector2Int GetSize
-    {
-        get
-        {
-            if(isRotate == false)
-            {
-                return towerSize;
-            }
-            else
-            {
-                towerSize = new Vector2Int(towerSize.y, towerSize.x);
-                return towerSize;
-            }
-        }
-    }
     public bool GetPrevMatChanged
     {
         get => isPrevMatChanged;
         set => isPrevMatChanged = value;
-    }
-    public bool GetIsRotate
-    {
-        get => isRotate;
-        set => isRotate = value;
     }
 
     private void Awake()
@@ -86,7 +65,6 @@ public class TowerController : MonoBehaviour
         float typeCast = isCanBuild ? 1f : 0f;
         if(matValue == typeCast)
         {
-            Debug.Log("같으니까 돌아가!");
             return;
         }
         if (isCanBuild == true)
@@ -96,6 +74,51 @@ public class TowerController : MonoBehaviour
         else
         {
             newTowerMat.SetFloat("_isRoadConnect", 0f);
+        }
+    }
+
+    public List<Vector2Int> SetCheckIdxOffset(Vector2Int offset)
+    {
+        List<Vector2Int> offsetList = new List<Vector2Int>();
+        int minX = Mathf.Min(0, offset.x);
+        int maxX = Mathf.Max(0, offset.x);
+
+        int minY = Mathf.Min(0, offset.y);
+        int maxY = Mathf.Max(0, offset.y);
+
+        for(int y = minY; y<=maxY; y++)
+        {
+            for(int x= minX; x<=maxX; x++)
+            {
+                offsetList.Add(new Vector2Int(x, y));
+            }
+        }
+
+        return offsetList;
+    }
+
+    public Vector2Int GetRotateTowerSize(int rotateNum)
+    {
+        if(rotateNum == 1 || rotateNum == 3)
+        {
+            return new Vector2Int(towerSize.y, towerSize.x);
+        }
+        return towerSize;
+    }
+
+    public Vector2Int RotateAnchorOffset(int rotateNum)
+    {
+        Vector2Int offset = myTower.anchorOffset;
+        switch(rotateNum)
+        {
+            case 1:
+                return new Vector2Int(offset.y, -offset.x);
+            case 2:
+                return new Vector2Int(-offset.x, -offset.y);
+            case 3:
+                return new Vector2Int(-offset.y, offset.x);
+            default:
+                return offset;
         }
     }
 

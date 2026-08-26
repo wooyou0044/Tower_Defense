@@ -17,6 +17,7 @@ MonoBehaviour:
   buildCoin: 50
   towerCount: 0
   att: 0
+  anchorOffset: {x: 0, y: 0}
   defType: 1
   attRangeRad: 0
   defTowerObject: {fileID: 9134356816723572609, guid: bfdcbccb38adb5643924aa06ffd1f323, type: 3}

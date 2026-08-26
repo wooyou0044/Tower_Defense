@@ -18,6 +18,7 @@ public class DefTower : ScriptableObject
     public int buildCoin;
     public int towerCount;
     public int att;
+    public Vector2Int anchorOffset = new Vector2Int(0, 0);
     public eDefTowerType defType;
     public float attRangeRad;
     public GameObject defTowerObject;
