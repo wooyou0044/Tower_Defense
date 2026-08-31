@@ -15,6 +15,7 @@ public class TowerController : MonoBehaviour
     DefTower myTower;
 
     public DefTower MyTower { get => myTower; }
+    public int GetTileSize { get => tileSize; }
 
     public bool GetPrevMatChanged
     {
@@ -27,10 +28,10 @@ public class TowerController : MonoBehaviour
         footPrintCol = GetComponent<Collider>();
         towerRend = transform.GetChild(0).GetComponent<MeshRenderer>();
         originMat = towerRend.material;
+        towerSize = GetTowerSize(footPrintCol);
     }
     void Start()
     {
-        towerSize = GetTowerSize(footPrintCol);
         isPrevMatChanged = false;
     }
 
@@ -117,6 +118,24 @@ public class TowerController : MonoBehaviour
                 return new Vector2Int(-offset.x, -offset.y);
             case 3:
                 return new Vector2Int(-offset.y, offset.x);
+            default:
+                return offset;
+        }
+    }
+
+    public Vector2 RotateAnchorTileSizeOffset(int rotateNum)
+    {
+        Vector2Int rotateTowerSize = GetRotateTowerSize(rotateNum);
+        Vector2 offset = new Vector2(myTower.anchorOffset.x + (rotateTowerSize.x - 1) * 0.5f, myTower.anchorOffset.y + (rotateTowerSize.y - 1)*0.5f);
+        //Debug.Log($"RotateNum = {rotateNum}, Anchor = {myTower.anchorOffset}, Size = {rotateTowerSize}, offset = {offset}");
+        switch (rotateNum)
+        {
+            case 1:
+                return new Vector2(offset.y, -offset.x);
+            case 2:
+                return new Vector2(-offset.x, -offset.y);
+            case 3:
+                return new Vector2(-offset.y, offset.x);
             default:
                 return offset;
         }

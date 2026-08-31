@@ -26,7 +26,9 @@ public class BuildManager : MonoBehaviour
 
     Vector2Int hitGridIndex;
     Vector2Int anchorStartOffset;
+    Vector2 anchorTileSizeOffset;
     //TileNode prevHitTileNode;
+    int tileSize;
 
     static public BuildManager Instance
     {
@@ -70,6 +72,8 @@ public class BuildManager : MonoBehaviour
             }
             // 들고 있는 타워 회전
             RotatePrevTower();
+            anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
+            anchorTileSizeOffset = towerCtrl.RotateAnchorTileSizeOffset(rotateCount);
         }
 
         //UpdateTowerPlace(prevTower);
@@ -179,6 +183,12 @@ public class BuildManager : MonoBehaviour
         prevTower = dicTowerObject[towerID];
         prevTowerID = towerID;
         towerCtrl = prevTower.GetComponent<TowerController>();
+        anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
+        anchorTileSizeOffset = towerCtrl.RotateAnchorTileSizeOffset(rotateCount);
+        if(tileSize == 0)
+        {
+            tileSize = towerCtrl.GetTileSize;
+        }
     }
 
     public void MakeNewTower(DefTower tower)
@@ -203,8 +213,9 @@ public class BuildManager : MonoBehaviour
     {
         //타워 위치 조정
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
-        Debug.Log("anchorStartOffset : " + anchorStartOffset);
-        prevTower.transform.position = worldPos + (new Vector3(anchorStartOffset.x, 0, anchorStartOffset.y)*3);
+        Vector3 anchorOffset = new Vector3(anchorTileSizeOffset.x, 0, anchorTileSizeOffset.y) * tileSize;
+        Debug.Log("anchorOffset : " + anchorOffset);
+        prevTower.transform.position = worldPos + anchorOffset;
     }
 
     void GetTowerSizeTileType(GameObject towerObj, Vector3 mousePosition)
@@ -224,7 +235,7 @@ public class BuildManager : MonoBehaviour
             hitMinimapMgr = hit.transform.GetComponentInParent<MiniMapManager>();
             hitGridIndex = hitMinimapMgr.WorldToGridIndex(hit.point);
             TileNode hitTileNode = hitMinimapMgr.miniMapInfo.TileNodes[hitGridIndex.y, hitGridIndex.x];
-            anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
+            //anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
             if (hitTileNode.height > 0 && hitTileNode.installedTower == null)
             {
                 //Debug.Log("맞은 타일의 globalIndex : " + prevHitTileNode.globalIndex);
