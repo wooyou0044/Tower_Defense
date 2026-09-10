@@ -116,6 +116,9 @@ public class GameManager : MonoBehaviour
         MapManager.Instance.SetActiveAllCreateMinimapBtn(false);
         uiMgr.SetActiveSendWave(false);
         uiMgr.SetBuildMapActive(false);
+        // 마우스에 붙어 있는 타워 비활성화
+        uiMgr.SetCanNotBuildIconActive(false);
+        BuildManager.Instance.DeActivateTower();
         //List<EnemyPathInfo> enemyPaths = MapManager.Instance.EnemyPathInfos;
         Dictionary<Vector3, EnemyPathInfo> dicEnemyPath = MapManager.Instance.EnemyPathInfos;
         List<EnemyPathInfo> enemyPaths = new List<EnemyPathInfo>(dicEnemyPath.Values);

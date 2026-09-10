@@ -152,7 +152,7 @@ public class MapManager : MonoBehaviour
             minimapMgr.SetGlobalIndex(centMinimapMgr.miniMapInfo, direction);
 
             // 임시 Debug 확인
-            minimapMgr.TempPrint();
+            //minimapMgr.TempPrint();
 
             newMinimap = null;
         }
@@ -342,7 +342,7 @@ public class MapManager : MonoBehaviour
             mapMgr.SetGlobalIndex(neighborNode, neighborMapDirect);
         }
 
-        minimapMgr.TempPrint();
+        //minimapMgr.TempPrint();
 
         minimapMgr.ResetOriginMaterial();
 

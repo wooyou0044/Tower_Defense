@@ -1711,7 +1711,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8f58ffc128d604f45ba09ad506406e03, type: 2}
   uiMgr: {fileID: 184898864}
   initRndTowerNum: 5
-  buildTowerTrans: {fileID: 1269845303}
+  prevBuildTowerTrans: {fileID: 1269845303}
+  buildTowerTrans: {fileID: 925063904}
   previewTowerMat: {fileID: 2100000, guid: 67dbf8a9ca5b51145ab6643e8c1fe2f8, type: 2}
 --- !u!4 &415186253
 Transform:
@@ -3769,6 +3770,37 @@ Transform:
   - {fileID: 1392862137}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &925063903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 925063904}
+  m_Layer: 0
+  m_Name: BuildTower
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &925063904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925063903}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &929851054
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4676,7 +4708,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1269845303}
   m_Layer: 0
-  m_Name: BuildTower
+  m_Name: PrevBuildTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7159,6 +7191,7 @@ SceneRoots:
   - {fileID: 1120532337}
   - {fileID: 415186253}
   - {fileID: 1269845303}
+  - {fileID: 925063904}
   - {fileID: 1623665375}
   - {fileID: 897237500}
   - {fileID: 6685010115427891670}

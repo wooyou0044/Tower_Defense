@@ -8,6 +8,7 @@ public class BuildManager : MonoBehaviour
     [SerializeField] DefTower[] towerSO;
     [SerializeField] UIManager uiMgr;
     [SerializeField] int initRndTowerNum;
+    [SerializeField] Transform prevBuildTowerTrans;
     [SerializeField] Transform buildTowerTrans;
     [SerializeField] Material previewTowerMat;
 
@@ -22,13 +23,18 @@ public class BuildManager : MonoBehaviour
     Camera cam;
     TowerController towerCtrl;
     List<DefTower> initRndTowerList;
+    List<Vector2Int> tileOffsetList;
     MiniMapManager hitMinimapMgr;
 
     Vector2Int hitGridIndex;
     Vector2Int anchorStartOffset;
+    Vector2Int towerSize;
     Vector2 anchorTileSizeOffset;
     //TileNode prevHitTileNode;
     int tileSize;
+
+    Vector2 centerOffset;
+    Vector3 centerPos;
 
     static public BuildManager Instance
     {
@@ -47,6 +53,7 @@ public class BuildManager : MonoBehaviour
         cam = Camera.main;
 
         dicGlobalTileNode = new Dictionary<Vector2Int, TileNode>();
+        tileOffsetList = new List<Vector2Int>();
     }
 
     void Start()
@@ -74,16 +81,14 @@ public class BuildManager : MonoBehaviour
             RotatePrevTower();
             anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
             anchorTileSizeOffset = towerCtrl.RotateAnchorTileSizeOffset(rotateCount);
+            //centerPos = towerCtrl.GetRotateCenterPos(rotateCount);
+            towerCtrl.SetCheckIdxOffset(anchorStartOffset, tileOffsetList);
         }
 
         //UpdateTowerPlace(prevTower);
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 10f;
         GetTowerSizeTileType(prevTower, mousePos);
-        if (Input.GetMouseButtonDown(0))
-        {
-
-        }
     }
 
     void InitiateDefTower()
@@ -114,7 +119,7 @@ public class BuildManager : MonoBehaviour
 
     GameObject MakePrevTower(GameObject towerPrefab)
     {
-        GameObject prevTowerObj = Instantiate(towerPrefab, buildTowerTrans);
+        GameObject prevTowerObj = Instantiate(towerPrefab, prevBuildTowerTrans);
         prevTowerObj.transform.position = Input.mousePosition;
         return prevTowerObj;
     }
@@ -185,10 +190,25 @@ public class BuildManager : MonoBehaviour
         towerCtrl = prevTower.GetComponent<TowerController>();
         anchorStartOffset = towerCtrl.RotateAnchorOffset(rotateCount);
         anchorTileSizeOffset = towerCtrl.RotateAnchorTileSizeOffset(rotateCount);
-        if(tileSize == 0)
+        centerPos = towerCtrl.GetRotateCenterPos(rotateCount);
+        towerCtrl.SetCheckIdxOffset(anchorStartOffset, tileOffsetList);
+        if (tileSize == 0)
         {
             tileSize = towerCtrl.GetTileSize;
         }
+    }
+
+    public void DeActivateTower()
+    {
+        if(prevTower == null)
+        {
+            return;
+        }
+        prevTower.transform.rotation = Quaternion.identity;
+        prevTower.SetActive(false);
+        prevTower = null;
+        prevTowerID = 0;
+        towerCtrl = null;
     }
 
     public void MakeNewTower(DefTower tower)
@@ -213,9 +233,10 @@ public class BuildManager : MonoBehaviour
     {
         //타워 위치 조정
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
-        Vector3 anchorOffset = new Vector3(anchorTileSizeOffset.x, 0, anchorTileSizeOffset.y) * tileSize;
-        Debug.Log("anchorOffset : " + anchorOffset);
-        prevTower.transform.position = worldPos + anchorOffset;
+        //Vector3 anchorOffset = new Vector3(anchorTileSizeOffset.x, 0, anchorTileSizeOffset.y) * tileSize;
+        //Debug.Log("anchorOffset : " + anchorOffset);
+        //prevTower.transform.position = worldPos + anchorOffset;
+        prevTower.transform.position = worldPos + MoveTowerPos();
     }
 
     void GetTowerSizeTileType(GameObject towerObj, Vector3 mousePosition)
@@ -224,7 +245,6 @@ public class BuildManager : MonoBehaviour
         {
             towerCtrl = towerObj.GetComponent<TowerController>();
         }
-
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         int buildLayer = LayerMask.GetMask("Buildable");
@@ -239,39 +259,49 @@ public class BuildManager : MonoBehaviour
             if (hitTileNode.height > 0 && hitTileNode.installedTower == null)
             {
                 //Debug.Log("맞은 타일의 globalIndex : " + prevHitTileNode.globalIndex);
-                if (CheckHeightByTowerSize(hitTileNode))
+                if (CheckHeightByTowerSize(hitTileNode, tileOffsetList))
                 {
                     //Debug.Log("건설 가능");
                     towerCtrl.ChangeMatCanBuild(true);
                     uiMgr.SetCanNotBuildIconActive(false);
+                    // 왼쪽 마우스 키 누르면 타워 건설
+                    BuildTower(towerCtrl, hitTileNode);
                 }
                 else
                 {
-                    towerCtrl.ChangeMatCanBuild(false);
-                    uiMgr.SetCanNotBuildIconPos(mousePosition);
-                    Debug.Log("건설 불가능");
+                    CantBuildTower(mousePosition);
                 }
+            }
+            else
+            {
+                CantBuildTower(mousePosition);
             }
         }
         else
         {
             // 건설할 수 없는 곳이기 때문에 타워도 빨간색으로 하고 x표시 ui?나와야 함
-            towerCtrl.ChangeMatCanBuild(false);
-            uiMgr.SetCanNotBuildIconPos(mousePosition);
+            CantBuildTower(mousePosition);
         }
 
         UpdateTowerPlace(mousePosition);
     }
 
-    bool CheckHeightByTowerSize(TileNode hitTileNode)
+    void CantBuildTower(Vector3 mousePos)
+    {
+        towerCtrl.ChangeMatCanBuild(false);
+        uiMgr.SetCanNotBuildIconPos(mousePos);
+    }
+
+    bool CheckHeightByTowerSize(TileNode hitTileNode, List<Vector2Int> footprintList)
     {
         //Debug.Log("타워 사이즈 : " + towerCtrl.GetSize);
         //타워 사이즈에 맞춰 1. 타워 타입이 Buildable인지 체크 2. installedTower가 있는지 확인 3. 높이가 같은지 체크
-        Vector2Int towerSize = towerCtrl.GetRotateTowerSize(rotateCount);
+        towerSize = towerCtrl.GetRotateTowerSize(rotateCount);
         float hitTileHeight = hitTileNode.height;
 
         Vector2Int startGlobalIdx = hitTileNode.globalIndex;
-        List<Vector2Int> footprintList = towerCtrl.SetCheckIdxOffset(anchorStartOffset);
+        //List<Vector2Int> footprintList = towerCtrl.SetCheckIdxOffset(anchorStartOffset);
+        //towerCtrl.SetCheckIdxOffset(anchorStartOffset, footprintList);
         foreach(Vector2Int offset in footprintList)
         {
             Vector2Int checkIdx = startGlobalIdx + offset;
@@ -319,6 +349,51 @@ public class BuildManager : MonoBehaviour
             dicGlobalTileNode.Add(globalIndex, node);
         }
         dicGlobalTileNode[globalIndex] = node;
+    }
+
+    void BuildTower(TowerController towerCtrl, TileNode node)
+    {
+        if(towerCtrl == null)
+        {
+            return;
+        }
+        if(Input.GetMouseButtonDown(0))
+        {
+            //Vector3 towerPos = node.worldPosition + new Vector3(anchorTileSizeOffset.x, 0, anchorTileSizeOffset.y) * tileSize;
+            //centerOffset = Vector2.zero;
+            //centerPos = towerCtrl.GetRotateCenterPos(rotateCount);
+            //foreach(Vector2Int offset in tileOffsetList)
+            //{
+            //    centerOffset += offset;
+            //}
+            //centerOffset /= tileOffsetList.Count;
+            //Vector3 towerPos = node.worldPosition + new Vector3(centerOffset.x, 0f, centerOffset.y) * tileSize - new Vector3(centerPos.x, 0, centerPos.z);
+            Vector3 towerPos = node.worldPosition + MoveTowerPos();
+            towerPos.y += node.buildY;
+            // Instantiate 할때 타워 크기랑 회전을 고려해 위치 수정
+            GameObject tower = Instantiate(towerCtrl.MyTower.defTowerObject, towerPos, Quaternion.identity, buildTowerTrans);
+            // 회전한 횟수만큼 타워 회전
+            tower.transform.rotation = Quaternion.Euler(0, 90 * rotateCount, 0);
+            // 해당 타워 크기만큼 해당하는 타일 노드 안의 installedTower 채우기
+            for(int i=0; i< tileOffsetList.Count; i++)
+            {
+                Vector2Int offset = node.globalIndex + tileOffsetList[i];
+                dicGlobalTileNode[offset].installedTower = tower.GetComponent<TowerController>();
+            }
+        }
+    }
+
+    Vector3 MoveTowerPos()
+    {
+        centerOffset = Vector2.zero;
+        centerPos = towerCtrl.GetRotateCenterPos(rotateCount);
+        foreach (Vector2Int offset in tileOffsetList)
+        {
+            centerOffset += offset;
+        }
+        centerOffset /= tileOffsetList.Count;
+        Vector3 pos = new Vector3(centerOffset.x, 0f, centerOffset.y) * tileSize - new Vector3(centerPos.x, 0, centerPos.z);
+        return pos;
     }
 
     public void TempPrint()

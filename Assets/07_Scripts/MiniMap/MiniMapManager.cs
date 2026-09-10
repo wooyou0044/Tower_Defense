@@ -98,12 +98,14 @@ public class MiniMapManager : MonoBehaviour
                         int z = baseZ + i;
                         tileNodes[z, j].type = nodeCtrl.Type;
                         //tileNodes[z, j] = new TileNode(node.type);
-                        tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
+                        //tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
                         if (nodeCtrl.Type == TileType.Road || tileNodes[z, j].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
+                        tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
                         tileNodes[z, j].height = ExamineHeight(pos.y, scale.y);
+                        tileNodes[z, j].buildY = nodeCtrl.GetTopY + 1;
                     }
                 }
                 continue;
@@ -119,12 +121,14 @@ public class MiniMapManager : MonoBehaviour
                         int x = baseX + j;
                         tileNodes[i, x].type = nodeCtrl.Type;
                         //tileNodes[i, x] = new TileNode(node.type);
-                        tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
+                        //tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
                         if (nodeCtrl.Type == TileType.Road || tileNodes[i, x].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
+                        tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
                         tileNodes[i, x].height = ExamineHeight(pos.y, scale.y);
+                        tileNodes[i, x].buildY = nodeCtrl.GetTopY + 1;
                     }
                 }
                 continue;
@@ -228,12 +232,14 @@ public class MiniMapManager : MonoBehaviour
                     {
                         tileNodes[z, x].type = nodeCtrl.Type;
                         //Vector3 centerOffset = new Vector3((x - indexSize / 2) * 4, pos.y, (indexSize / 2 - z) * 4);
-                        tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
+                        //tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
                         if (nodeCtrl.Type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
                         {
                             continue;
                         }
+                        tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
                         tileNodes[z, x].height = ExamineHeight(pos.y, scale.y);
+                        tileNodes[z, x].buildY = nodeCtrl.GetTopY + 1;
                     }
                 }
             }

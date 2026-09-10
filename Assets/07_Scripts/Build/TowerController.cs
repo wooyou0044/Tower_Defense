@@ -12,6 +12,7 @@ public class TowerController : MonoBehaviour
     MeshRenderer towerRend;
     Material originMat;
     Material newTowerMat;
+    Vector3 centerPos;
     DefTower myTower;
 
     public DefTower MyTower { get => myTower; }
@@ -29,6 +30,7 @@ public class TowerController : MonoBehaviour
         towerRend = transform.GetChild(0).GetComponent<MeshRenderer>();
         originMat = towerRend.material;
         towerSize = GetTowerSize(footPrintCol);
+        centerPos = footPrintCol.bounds.center;
     }
     void Start()
     {
@@ -78,9 +80,10 @@ public class TowerController : MonoBehaviour
         }
     }
 
-    public List<Vector2Int> SetCheckIdxOffset(Vector2Int offset)
+    public void SetCheckIdxOffset(Vector2Int offset, List<Vector2Int> offsetList)
     {
-        List<Vector2Int> offsetList = new List<Vector2Int>();
+        offsetList.Clear();
+
         int minX = Mathf.Min(0, offset.x);
         int maxX = Mathf.Max(0, offset.x);
 
@@ -94,8 +97,6 @@ public class TowerController : MonoBehaviour
                 offsetList.Add(new Vector2Int(x, y));
             }
         }
-
-        return offsetList;
     }
 
     public Vector2Int GetRotateTowerSize(int rotateNum)
@@ -138,6 +139,21 @@ public class TowerController : MonoBehaviour
                 return new Vector2(-offset.y, offset.x);
             default:
                 return offset;
+        }
+    }
+
+    public Vector3 GetRotateCenterPos(int rotateNum)
+    {
+        switch(rotateNum)
+        {
+            case 1:
+                return new Vector3(centerPos.z, 0, -centerPos.x);
+            case 2:
+                return new Vector3(-centerPos.x, 0, -centerPos.z);
+            case 3:
+                return new Vector3(-centerPos.z, 0, centerPos.x);
+            default:
+                return centerPos;
         }
     }
 

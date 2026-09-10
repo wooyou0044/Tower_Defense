@@ -15,6 +15,7 @@ public class TileNode
 
     public float height;
     public Vector3 worldPosition;
+    public float buildY;
 
     public Vector2Int globalIndex;
     public TowerController installedTower;
