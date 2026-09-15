@@ -6,7 +6,6 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] Image playerInfoPanel;
     [SerializeField] Image rerollMapPanel;
     [SerializeField] Image sendWavePanel;
     [SerializeField] Image rewardPanel;
@@ -15,6 +14,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI baseHPTxt;
     [SerializeField] TextMeshProUGUI curWaveCountTxt;
     [SerializeField] TextMeshProUGUI totWaveCountTxt;
+    [SerializeField] TextMeshProUGUI towerBuildCointTxt;
     [SerializeField] TextMeshProUGUI rerollMapCoinTxt;
     [Header("Build Button Area")]
     [SerializeField] Transform buildBtnGridArea;
@@ -28,6 +28,8 @@ public class UIManager : MonoBehaviour
 
     Button rerollMapBtn;
     Button sendWaveBtn;
+
+    int prevBuildCoin;
 
     bool isRerollBtnActive;
 
@@ -64,8 +66,8 @@ public class UIManager : MonoBehaviour
 
         // 이벤트 구독
         GameManager.Instance.OnChangeBaseHp += ChangeBaseHp;
-        GameManager.Instance.OnChangeWaveCount += ChangeWaveCount;
-        GameManager.Instance.OnChangeRerollCoin += ChangeRerollCoin;
+        //GameManager.Instance.OnChangeWaveCount += ChangeWaveCount;
+        //GameManager.Instance.OnChangeRerollCoin += ChangeRerollCoin;
     }
 
     void Update()
@@ -152,17 +154,25 @@ public class UIManager : MonoBehaviour
         rerollMapCoinTxt.text = rerollCoin.ToString();
     }
 
+    public void ChangeBuildTowerCoin(int buildCoin)
+    {
+        if(buildCoin <= 0)
+        {
+            buildCoin = 0;
+        }
+        if(prevBuildCoin != buildCoin)
+        {
+            prevBuildCoin = buildCoin;
+        }
+        towerBuildCointTxt.text = buildCoin.ToString();
+    }
+
     public void MakeInitTowerBtn(List<DefTower> towerList)
     {
         towerBtnCtrlList = new List<BuildBtnController>();
 
         for (int i=0; i<towerList.Count; i++)
         {
-            //GameObject towerBtn = Instantiate(buildBtnPrefab, buildBtnGridArea);
-            //BuildBtnController btnCtrl = towerBtn.GetComponent<BuildBtnController>();
-            //btnCtrl.btnTower = towerList[i];
-            //btnCtrl.ChangeBtnInfo(towerList[i].buildCoin, towerList[i].towerCount, towerList[i].defTowerImage);
-
             MakeTowerBtnPrefab(towerList[i]);
         }
     }
@@ -183,16 +193,23 @@ public class UIManager : MonoBehaviour
         {
             sendWavePanel.gameObject.SetActive(isActive);
         }
-        for(int i=0; i< towerBtnCtrlList.Count; i++)
+        InteractTowerButton(isActive);
+    }
+
+    public void InteractTowerButton(bool isActive)
+    {
+        for(int i=0; i<towerBtnCtrlList.Count; i++)
         {
-            Button btn = towerBtnCtrlList[i].GetComponent<Button>();
-            if(isActive == false)
+            if(towerBtnCtrlList[i].btnTower.towerCount < 1)
             {
-                towerBtnCtrlList[i].SetOffChooseBtnOutline();
+                continue;
             }
-            towerBtnCtrlList[i].IsBtnActive = isActive;
-            towerBtnCtrlList[i].SetInteractImgActive(!isActive);
-            btn.interactable = isActive;
+            if(towerBtnCtrlList[i].btnTower.buildCoin > prevBuildCoin)
+            {
+                ChangeTowerInfo(towerBtnCtrlList[i], false);
+                continue;
+            }
+            ChangeTowerInfo(towerBtnCtrlList[i], isActive);
         }
     }
 
@@ -215,6 +232,18 @@ public class UIManager : MonoBehaviour
         canNotBuildIcon.transform.position = pos + new Vector3(70, 30, 0);
     }
 
+    void ChangeTowerInfo(BuildBtnController buildBtnCtrl, bool isActive)
+    {
+        Button btn = buildBtnCtrl.GetComponent<Button>();
+        if (isActive == false)
+        {
+            buildBtnCtrl.SetOffChooseBtnOutline();
+        }
+        buildBtnCtrl.IsBtnActive = isActive;
+        buildBtnCtrl.SetInteractImgActive(!isActive);
+        btn.interactable = isActive;
+    }
+
     void ChangeRewardPanel()
     {
 
@@ -224,7 +253,7 @@ public class UIManager : MonoBehaviour
     {
         // 이벤트 구독 해제
         GameManager.Instance.OnChangeBaseHp -= ChangeBaseHp;
-        GameManager.Instance.OnChangeWaveCount -= ChangeWaveCount;
-        GameManager.Instance.OnChangeRerollCoin -= ChangeRerollCoin;
+        //GameManager.Instance.OnChangeWaveCount -= ChangeWaveCount;
+        //GameManager.Instance.OnChangeRerollCoin -= ChangeRerollCoin;
     }
 }

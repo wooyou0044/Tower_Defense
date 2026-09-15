@@ -30,6 +30,7 @@ public class TowerController : MonoBehaviour
         towerRend = transform.GetChild(0).GetComponent<MeshRenderer>();
         originMat = towerRend.material;
         towerSize = GetTowerSize(footPrintCol);
+        Debug.Log("towerSize : " + towerSize);
         centerPos = footPrintCol.bounds.center;
     }
     void Start()

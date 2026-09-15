@@ -39,9 +39,9 @@ public class BuildBtnController : MonoBehaviour, IPointerEnterHandler, IPointerE
     void Start()
     {
         chooseBtnOutline.SetActive(false);
-        if(btnTower != null)
+        if(myTower != null)
         {
-            towerPrefab = btnTower.defTowerObject;
+            towerPrefab = myTower.defTowerObject;
         }
     }
 
@@ -60,7 +60,7 @@ public class BuildBtnController : MonoBehaviour, IPointerEnterHandler, IPointerE
     public void OnClickBuildButton()
     {
         Debug.Log("나의 Tower 정보 : " + myTower.towerName);
-        BuildManager.Instance.SetActiveTowerPrefab(myTower);
+        BuildManager.Instance.SetActiveTowerPrefab(myTower, this);
     }
 
     public void SetInteractImgActive(bool isActive)
@@ -73,6 +73,23 @@ public class BuildBtnController : MonoBehaviour, IPointerEnterHandler, IPointerE
         if(chooseBtnOutline.activeSelf == true)
         {
             chooseBtnOutline.SetActive(false);
+        }
+    }
+
+    public void ChangeTowerNum(bool isBuild = true)
+    {
+        if(isBuild == true)
+        {
+            myTower.towerCount--;
+        }
+        else
+        {
+            myTower.towerCount++;
+        }
+        buildCountTMP.text = myTower.towerCount.ToString();
+        if (myTower.towerCount < 1)
+        {
+            gameObject.SetActive(false);
         }
     }
 

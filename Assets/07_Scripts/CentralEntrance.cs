@@ -11,7 +11,6 @@ public class CentralEntrance : MonoBehaviour
             EnemyController enemyCtrl = other.GetComponent<EnemyController>();
             GameManager.Instance.ReturnEnemy(enemyCtrl);
             GameManager.Instance.EnemyAttackCentral(enemyCtrl.AttackEnemyAtt());
-            Debug.Log("적이 쳐들어옴");
         }
     }
 }

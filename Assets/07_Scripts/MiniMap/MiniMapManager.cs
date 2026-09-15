@@ -99,12 +99,25 @@ public class MiniMapManager : MonoBehaviour
                         tileNodes[z, j].type = nodeCtrl.Type;
                         //tileNodes[z, j] = new TileNode(node.type);
                         //tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
-                        if (nodeCtrl.Type == TileType.Road || tileNodes[z, j].height > ExamineHeight(pos.y, scale.y))
+                        //if (nodeCtrl.Type == TileType.Road || tileNodes[z, j].height > ExamineHeight(pos.y, scale.y))
+                        //{
+                        //    continue;
+                        //}
+                        Vector3 currentWorldPos = SetTileNodeWorldPosition(j, z, transform, pos.y);
+                        if(nodeCtrl.Type == TileType.Road)
+                        {
+                            tileNodes[z, j].worldPosition = currentWorldPos;
+                            continue;
+                        }
+                        int currentHeight = ExamineHeight(pos.y, scale.y);
+                        if(tileNodes[z, j].height > currentHeight)
                         {
                             continue;
                         }
-                        tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
-                        tileNodes[z, j].height = ExamineHeight(pos.y, scale.y);
+                        tileNodes[z, j].worldPosition = currentWorldPos;
+                        tileNodes[z, j].height = currentHeight;
+                        //tileNodes[z, j].worldPosition = SetTileNodeWorldPosition(j, z, transform, pos.y);
+                        //tileNodes[z, j].height = ExamineHeight(pos.y, scale.y);
                         tileNodes[z, j].buildY = nodeCtrl.GetTopY + 1;
                     }
                 }
@@ -122,12 +135,25 @@ public class MiniMapManager : MonoBehaviour
                         tileNodes[i, x].type = nodeCtrl.Type;
                         //tileNodes[i, x] = new TileNode(node.type);
                         //tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
-                        if (nodeCtrl.Type == TileType.Road || tileNodes[i, x].height > ExamineHeight(pos.y, scale.y))
+                        //if (nodeCtrl.Type == TileType.Road || tileNodes[i, x].height > ExamineHeight(pos.y, scale.y))
+                        //{
+                        //    continue;
+                        //}
+                        Vector3 currentWorldPos = SetTileNodeWorldPosition(x, i, transform, pos.y);
+                        if (nodeCtrl.Type == TileType.Road)
+                        {
+                            tileNodes[i, x].worldPosition = currentWorldPos;
+                            continue;
+                        }
+                        int currentHeight = ExamineHeight(pos.y, scale.y);
+                        if (tileNodes[i, x].height > currentHeight)
                         {
                             continue;
                         }
-                        tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
-                        tileNodes[i, x].height = ExamineHeight(pos.y, scale.y);
+                        tileNodes[i, x].worldPosition = currentWorldPos;
+                        tileNodes[i, x].height = currentHeight;
+                        //tileNodes[i, x].worldPosition = SetTileNodeWorldPosition(x, i, transform, pos.y);
+                        //tileNodes[i, x].height = ExamineHeight(pos.y, scale.y);
                         tileNodes[i, x].buildY = nodeCtrl.GetTopY + 1;
                     }
                 }
@@ -233,12 +259,25 @@ public class MiniMapManager : MonoBehaviour
                         tileNodes[z, x].type = nodeCtrl.Type;
                         //Vector3 centerOffset = new Vector3((x - indexSize / 2) * 4, pos.y, (indexSize / 2 - z) * 4);
                         //tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
-                        if (nodeCtrl.Type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
+                        //if (nodeCtrl.Type == TileType.Road || tileNodes[z, x].height > ExamineHeight(pos.y, scale.y))
+                        //{
+                        //    continue;
+                        //}
+                        Vector3 currentWorldPos = SetTileNodeWorldPosition(x, z, transform, pos.y);
+                        if (nodeCtrl.Type == TileType.Road)
+                        {
+                            tileNodes[z, x].worldPosition = currentWorldPos;
+                            continue;
+                        }
+                        int currentHeight = ExamineHeight(pos.y, scale.y);
+                        if (tileNodes[z, x].height > currentHeight)
                         {
                             continue;
                         }
-                        tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
-                        tileNodes[z, x].height = ExamineHeight(pos.y, scale.y);
+                        tileNodes[z, x].worldPosition = currentWorldPos;
+                        tileNodes[z, x].height = currentHeight;
+                        //tileNodes[z, x].worldPosition = SetTileNodeWorldPosition(x, z, transform, pos.y);
+                        //tileNodes[z, x].height = ExamineHeight(pos.y, scale.y);
                         tileNodes[z, x].buildY = nodeCtrl.GetTopY + 1;
                     }
                 }
@@ -469,16 +508,16 @@ public class MiniMapManager : MonoBehaviour
 
     public void TempPrint()
     {
-        //for(int i=0; i<miniMapInfo.TileNodes.GetLength(0); i++)
-        //{
-        //    for(int j=0; j<miniMapInfo.TileNodes.GetLength(1); j++)
-        //    {
-        //        Debug.Log($"tileNodes[{i},{j}].Type = {miniMapInfo.TileNodes[i, j].type}");
-        //        Debug.Log($"tileNodes[{i},{j}].globalIndex = {miniMapInfo.TileNodes[i, j].globalIndex}");
-        //        Debug.Log($"tileNodes[{i},{j}].height = {miniMapInfo.TileNodes[i, j].height}");
-        //    }
-        //}
-        BuildManager.Instance.TempPrint();
+        for (int i = 0; i < miniMapInfo.TileNodes.GetLength(0); i++)
+        {
+            for (int j = 0; j < miniMapInfo.TileNodes.GetLength(1); j++)
+            {
+                Debug.Log($"tileNodes[{i},{j}].height = {miniMapInfo.TileNodes[i, j].height}");
+                Debug.Log($"tileNodes[{i},{j}].worldPosition.y = {miniMapInfo.TileNodes[i, j].worldPosition.y}");
+                Debug.Log($"tileNodes[{i},{j}].buildY = {miniMapInfo.TileNodes[i, j].buildY}");
+            }
+        }
+        //BuildManager.Instance.TempPrint();
     }
 
     void Rotate4<T>(ref T a, ref T b, ref T c, ref T d)

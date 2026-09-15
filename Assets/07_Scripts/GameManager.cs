@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour
 
     // 이벤트 발생
     public event Action<int, int> OnChangeBaseHp;
-    public event Action<int, int> OnChangeWaveCount;
-    public event Action<int> OnChangeRerollCoin;
+    //public event Action<int, int> OnChangeWaveCount;
+    //public event Action<int> OnChangeRerollCoin;
 
     public int GetPlayerBaseHP
     {
@@ -52,6 +52,11 @@ public class GameManager : MonoBehaviour
         {
             return getPlayerStat._mapRerollCoin;
         }
+    }
+
+    public int GetPlayerBuildCOin
+    {
+        get => getPlayerStat._buildTowerCoin;
     }
 
     public static GameManager Instance
@@ -80,11 +85,7 @@ public class GameManager : MonoBehaviour
         EnemyController enemyCtrl = enemy.GetComponent<EnemyController>();
         enemyPool = new ObjectPool<EnemyController>(enemyCtrl, enemyPoolSize, enemyInstParent);
 
-        uiMgr.ChangeBaseHp(fullBaseHP, getPlayerStat._baseHP);
-        curWaveCount = 1;
-        uiMgr.ChangeWaveCount(waveCount, curWaveCount);
-        uiMgr.ChangeRerollCoin(getPlayerStat._mapRerollCoin);
-
+        InitGameState();
     }
 
     void Update()
@@ -101,12 +102,22 @@ public class GameManager : MonoBehaviour
             uiMgr.SetBuildMapActive(false);
             // 원래 한 웨이브 끝나고 아이템 선택하면 waveCount++ 해야 하는데 임의로
             curWaveCount++;
-            OnChangeWaveCount.Invoke(waveCount, curWaveCount);
+            //OnChangeWaveCount.Invoke(waveCount, curWaveCount);
+            uiMgr.ChangeWaveCount(waveCount, curWaveCount);
             curEnemyCount = 0;
 
             // 한 웨이브가 끝나고 맵에 +버튼 생성
             MapManager.Instance.SetActiveAllCreateMinimapBtn(true);
         }
+    }
+
+    void InitGameState()
+    {
+        uiMgr.ChangeBaseHp(fullBaseHP, getPlayerStat._baseHP);
+        curWaveCount = 1;
+        uiMgr.ChangeWaveCount(waveCount, curWaveCount);
+        uiMgr.ChangeRerollCoin(getPlayerStat._mapRerollCoin);
+        uiMgr.ChangeBuildTowerCoin(getPlayerStat._buildTowerCoin);
     }
 
     public void SendWave()
@@ -196,6 +207,14 @@ public class GameManager : MonoBehaviour
         }
         getPlayerStat._baseHP -= enemyAtt;
         OnChangeBaseHp.Invoke(fullBaseHP, getPlayerStat._baseHP);
+    }
+
+    public void BuildTower(int buildCoin)
+    {
+        getPlayerStat._buildTowerCoin -= buildCoin;
+        uiMgr.ChangeBuildTowerCoin(getPlayerStat._buildTowerCoin);
+        // buildTowerCoin이 가지고 있는 타워들 buildCoin보다 적을 때 가능한 타워 버튼만 활성화
+        uiMgr.InteractTowerButton(true);
     }
 
     public int UseRerollMap()

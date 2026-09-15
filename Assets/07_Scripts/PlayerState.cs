@@ -4,6 +4,7 @@ public class PlayerState
 {
     public int _playerLvl;
     public int _mapRerollCoin;
+    public int _buildTowerCoin;
     public int _baseHP;
     public int _charLvl;
 
@@ -11,6 +12,7 @@ public class PlayerState
     {
         _playerLvl = playerLvl;
         _mapRerollCoin = 25;
+        _buildTowerCoin = 500;
 
         float charLvlCal = 1 + (charLvl * 0.05f);
         _baseHP = Mathf.FloorToInt(1500 * charLvlCal);
