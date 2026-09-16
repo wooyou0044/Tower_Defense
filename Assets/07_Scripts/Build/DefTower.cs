@@ -20,7 +20,7 @@ public class DefTower : ScriptableObject
     public int att;
     public Vector2Int anchorOffset = new Vector2Int(0, 0);
     public eDefTowerType defType;
-    public float attRangeRad;
+    public Vector3[] attRangeRad;
     public GameObject defTowerObject;
     public Sprite defTowerImage;
 

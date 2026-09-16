@@ -273,8 +273,12 @@ public class BuildManager : MonoBehaviour
                 //Debug.Log("맞은 타일의 globalIndex : " + prevHitTileNode.globalIndex);
                 if (CheckHeightByTowerSize(hitTileNode, tileOffsetList))
                 {
+                    if(prevTower.activeSelf == false)
+                    {
+                        prevTower.SetActive(true);
+                    }
                     //Debug.Log("건설 가능");
-                    towerCtrl.ChangeMatCanBuild(true);
+                    //towerCtrl.ChangeMatCanBuild(true);
                     uiMgr.SetCanNotBuildIconActive(false);
                     // 왼쪽 마우스 키 누르면 타워 건설
                     BuildTower(towerCtrl, hitTileNode);
@@ -303,7 +307,11 @@ public class BuildManager : MonoBehaviour
 
     void CantBuildTower(Vector3 mousePos)
     {
-        towerCtrl.ChangeMatCanBuild(false);
+        if(prevTower.activeSelf == true)
+        {
+            prevTower.SetActive(false);
+        }
+        //towerCtrl.ChangeMatCanBuild(false);
         uiMgr.SetCanNotBuildIconPos(mousePos);
     }
 
@@ -328,17 +336,17 @@ public class BuildManager : MonoBehaviour
             {
                 if(checkTileNode.type != TileType.Buildable)
                 {
-                    Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].type = {checkTileNode.type}이라 오류");
+                    //Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].type = {checkTileNode.type}이라 오류");
                     return false;
                 }
                 if(checkTileNode.installedTower != null)
                 {
-                    Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].installedTower = {checkTileNode.installedTower}이라 오류");
+                    //Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].installedTower = {checkTileNode.installedTower}이라 오류");
                     return false;
                 }
                 if(checkTileNode.height != hitTileHeight)
                 {
-                    Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].heihgt = {checkTileNode.height}이라 오류");
+                    //Debug.Log($"checkIndex[{checkIdx.x},{checkIdx.y}].heihgt = {checkTileNode.height}이라 오류");
                     return false;
                 }
             }

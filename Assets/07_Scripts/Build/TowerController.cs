@@ -60,6 +60,7 @@ public class TowerController : MonoBehaviour
         newTowerMat.SetTexture("_MainTexture", originMat.GetTexture("_BaseMap"));
         newTowerMat.SetFloat("_isBuildMinimap", 1f);
         newTowerMat.SetFloat("_Transparency", 0.8f);
+        newTowerMat.SetFloat("_isRoadConnect", 1f);
         towerRend.material = newTowerMat;
     }
 

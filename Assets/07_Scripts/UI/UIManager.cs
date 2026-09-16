@@ -229,7 +229,7 @@ public class UIManager : MonoBehaviour
         {
             SetCanNotBuildIconActive(true);
         }
-        canNotBuildIcon.transform.position = pos + new Vector3(70, 30, 0);
+        canNotBuildIcon.transform.position = pos;
     }
 
     void ChangeTowerInfo(BuildBtnController buildBtnCtrl, bool isActive)
