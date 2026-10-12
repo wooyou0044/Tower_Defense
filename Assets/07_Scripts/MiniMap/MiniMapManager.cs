@@ -17,14 +17,10 @@ public class MiniMapManager : MonoBehaviour
     float buildGridSize;
 
     public MinimapNode miniMapInfo { get; private set; }
+
     public int GetGridSize
     {
         get => indexSize;
-    }
-
-    public float GetBuildGridSize
-    {
-        get => buildGridSize;
     }
 
     private void Awake()
@@ -564,5 +560,24 @@ public class MiniMapManager : MonoBehaviour
         z = Mathf.Clamp(z, 0, indexSize - 1);
 
         return new Vector2Int(x, z);
+    }
+
+    public void MakeAttRangeTileNode(GameObject attRangeObj, Transform parent)
+    {
+        for(int i=0; i<tileNodes.GetLength(0); i++)
+        {
+            for(int j=0; j<tileNodes.GetLength(1); j++)
+            {
+                GameObject obj = Instantiate(attRangeObj, parent);
+                Material newMat = new Material(Resources.Load<Material>("AttRangeMat"));
+                obj.transform.GetChild(0).GetComponent<Renderer>().material = newMat;
+                obj.transform.Translate(tileNodes[i, j].worldPosition);
+                if(tileNodes[i, j].type == TileType.Road)
+                {
+                    obj.transform.position += new Vector3(0, 0.15f, 0);
+                }
+                //obj.SetActive(false);
+            }
+        }
     }
 }

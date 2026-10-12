@@ -22,6 +22,8 @@ public class MapManager : MonoBehaviour
     [SerializeField] Transform miniMapsParent;
     [SerializeField] Material miniMapMaterial;
     [SerializeField] Transform previewMinimapPos;
+    [SerializeField] GameObject attRangeObj;
+    [SerializeField] Transform attRangeObjTrans;
 
     Dictionary<Vector2, MinimapNode> dicMiniMaps;
     Dictionary<Vector3, EnemyPathInfo> dicTotalEnemyPath;
@@ -393,6 +395,8 @@ public class MapManager : MonoBehaviour
                 }
             }
         }
+
+        mapMgr.MakeAttRangeTileNode(attRangeObj, attRangeObjTrans);
     }
 
     void ResetNewMinimap()
