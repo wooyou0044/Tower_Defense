@@ -19,6 +19,6 @@ MonoBehaviour:
   att: 0
   anchorOffset: {x: 0, y: 0}
   defType: 1
-  attRangeRad: 0
+  attRangeRad: 20
   defTowerObject: {fileID: 9134356816723572609, guid: bfdcbccb38adb5643924aa06ffd1f323, type: 3}
   defTowerImage: {fileID: 21300000, guid: 91b3a875bd4e91d4f9b519e23a1e324b, type: 3}

@@ -562,22 +562,39 @@ public class MiniMapManager : MonoBehaviour
         return new Vector2Int(x, z);
     }
 
-    public void MakeAttRangeTileNode(GameObject attRangeObj, Transform parent)
+    public void MakeAttRangeTileNode()
     {
         for(int i=0; i<tileNodes.GetLength(0); i++)
         {
             for(int j=0; j<tileNodes.GetLength(1); j++)
             {
-                GameObject obj = Instantiate(attRangeObj, parent);
-                Material newMat = new Material(Resources.Load<Material>("AttRangeMat"));
-                obj.transform.GetChild(0).GetComponent<Renderer>().material = newMat;
-                obj.transform.Translate(tileNodes[i, j].worldPosition);
+                //GameObject obj = Instantiate(attRangeObj, parent);
+                //obj.transform.Translate(tileNodes[i, j].worldPosition);
+                //if(tileNodes[i, j].type == TileType.Road)
+                //{
+                //    obj.transform.position += new Vector3(0, 0.15f, 0);
+                //}
+                //tileNodes[i, j].attRangeObj = obj;
+                //Vector3 pos = new Vector3(tileNodes[i, j].worldPosition.x, 3.5f, tileNodes[i, j].worldPosition.z);
+                //BuildManager.Instance.SetDicWorldPosRange(pos, obj.GetComponent<AttRangeController>());
+                GameObject rangeQuad = MapManager.Instance.MakeAttRangeQuad(tileNodes[i, j].worldPosition);
                 if(tileNodes[i, j].type == TileType.Road)
                 {
-                    obj.transform.position += new Vector3(0, 0.15f, 0);
+                    rangeQuad.transform.position += new Vector3(0, 0.15f, 0);
                 }
-                //obj.SetActive(false);
+                //tileNodes[i, j].attRangeObj = rangeQuad;
+                BuildManager.Instance.SetDicWorldPosRange(tileNodes[i, j].worldPosition, rangeQuad.GetComponent<AttRangeController>());
+                rangeQuad.SetActive(false);
             }
+        }
+    }
+
+    public void SetTileOffset()
+    {
+        Vector3 diff = tileNodes[0, 0].worldPosition - tileNodes[1, 0].worldPosition;
+        if(BuildManager.Instance.GetTileOffset == 0)
+        {
+            BuildManager.Instance.GetTileOffset = Mathf.RoundToInt(Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.z)));
         }
     }
 }

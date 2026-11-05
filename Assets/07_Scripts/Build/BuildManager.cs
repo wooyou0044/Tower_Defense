@@ -11,6 +11,7 @@ public class BuildManager : MonoBehaviour
     [SerializeField] Transform prevBuildTowerTrans;
     [SerializeField] Transform buildTowerTrans;
     [SerializeField] Material previewTowerMat;
+    [SerializeField] float initUpgradeNum;
 
     static BuildManager _instance;
 
@@ -20,6 +21,7 @@ public class BuildManager : MonoBehaviour
 
     Dictionary<int, GameObject> dicTowerObject;
     Dictionary<Vector2Int, TileNode> dicGlobalTileNode;
+    Dictionary<Vector3, AttRangeController> dicWorldPosRangeQuad;
     Camera cam;
     TowerController towerCtrl;
     List<DefTower> initRndTowerList;
@@ -34,6 +36,7 @@ public class BuildManager : MonoBehaviour
     Vector2 anchorTileSizeOffset;
     //TileNode prevHitTileNode;
     int tileSize;
+    int tileOffset;
 
     Vector2 centerOffset;
     Vector3 centerPos;
@@ -50,6 +53,12 @@ public class BuildManager : MonoBehaviour
         get => buildBtnCtrl;
     }
 
+    public int GetTileOffset
+    {
+        get => tileOffset;
+        set => tileOffset = value;
+    }
+
     private void Awake()
     {
         if(_instance == null)
@@ -59,6 +68,7 @@ public class BuildManager : MonoBehaviour
         cam = Camera.main;
 
         dicGlobalTileNode = new Dictionary<Vector2Int, TileNode>();
+        dicWorldPosRangeQuad = new Dictionary<Vector3, AttRangeController>();
         tileOffsetList = new List<Vector2Int>();
     }
 
@@ -203,6 +213,7 @@ public class BuildManager : MonoBehaviour
         centerPos = towerCtrl.GetRotateCenterPos(rotateCount);
         towerCtrl.SetCheckIdxOffset(anchorStartOffset, tileOffsetList);
         buildBtnCtrl = towerBtnCtrl;
+        Debug.Log("해당 타워의 공격 종류 : " + towerCtrl.MyTower.attAreaType + " 범위 : " + towerCtrl.MyTower.attRangeRad);
         if (tileSize == 0)
         {
             tileSize = towerCtrl.GetTileSize;
@@ -277,6 +288,7 @@ public class BuildManager : MonoBehaviour
                     {
                         prevTower.SetActive(true);
                     }
+                    SetTowerAttRange(hitTileNode, towerCtrl.MyTower);
                     //Debug.Log("건설 가능");
                     //towerCtrl.ChangeMatCanBuild(true);
                     uiMgr.SetCanNotBuildIconActive(false);
@@ -417,6 +429,68 @@ public class BuildManager : MonoBehaviour
         return pos;
     }
 
+    public void SetDicWorldPosRange(Vector3 worldPos, AttRangeController attRangeCtrl)
+    {
+        dicWorldPosRangeQuad.Add(worldPos, attRangeCtrl);
+    }
+
+    bool IsRange(Vector3 centerPos, Vector3 targetPos, Vector2 attRange, DefTower myTower)
+    {
+        Vector3 delta = targetPos - centerPos;
+
+        float rangeX = attRange.x;
+        float rangeZ = attRange.y;
+
+        switch(myTower.attAreaType)
+        {
+            case eAttAreaType.CircleType:
+                float radius = rangeX;
+                return delta.x * delta.x + delta.z * delta.z <= radius * radius;
+        }
+        return false;
+    }
+
+    // 타워 설치 타일의 worldPosition에서 범위를 계산해서 해당 범위에 들어가는 타일 바꾸기
+    void SetTowerAttRange(TileNode applyTileNode, DefTower myTower)
+    {
+        Debug.Log("tileOffset : " + tileOffset);
+        Vector3 centerPos = applyTileNode.worldPosition;
+        Vector2 attRange = myTower.attRangeRad;
+        float maxRangeNum = Mathf.Max(attRange.x, attRange.y);
+        int searchNum = Mathf.CeilToInt(maxRangeNum) / tileOffset;
+
+        for(int x = -searchNum; x <= searchNum; x++)
+        {
+            for(int z = -searchNum; z <= searchNum; z++)
+            {
+                Vector3 targetPos = centerPos + new Vector3(x * tileOffset, 0f, z * tileOffset);
+                if (!IsRange(centerPos, targetPos, attRange, myTower))
+                {
+                    continue;
+                }
+                AttRangeController rangeCtrl = GetOrCreateDicAttRangeQuad(targetPos);
+                rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
+                if(rangeCtrl.gameObject.activeSelf == false)
+                {
+                    rangeCtrl.gameObject.SetActive(true);
+                }
+            }
+        }
+    }
+
+    AttRangeController GetOrCreateDicAttRangeQuad(Vector3 applyWorldPos)
+    {
+        if (dicWorldPosRangeQuad.TryGetValue(applyWorldPos, out var attRangeCtrl))
+        {
+            // 딕셔너리에 존재하면 키고 끄기
+            return attRangeCtrl;
+        }
+        // 딕셔너리 새로 생성
+        AttRangeController rangeQuadCtrl = MapManager.Instance.MakeAttRangeQuad(applyWorldPos).GetComponent<AttRangeController>();
+        dicWorldPosRangeQuad.Add(applyWorldPos, rangeQuadCtrl);
+        return rangeQuadCtrl;
+    }
+
     public void TempPrint()
     {
         foreach(KeyValuePair<Vector2Int, TileNode> kvp in dicGlobalTileNode)
@@ -426,6 +500,7 @@ public class BuildManager : MonoBehaviour
             Debug.Log($"GlboalIndex({kvp.Key}).height = {kvp.Value.height}");
         }
     }
+
 
     // 임시로 꺼졌을 때 DefTower에 있는 Count 값이 초기화되게 만들기
     private void OnDisable()

@@ -20,6 +20,8 @@ public class TileNode
     public Vector2Int globalIndex;
     public TowerController installedTower;
 
+    //GameObject attRangeTileObj;
+
     public float gridSize
     {
         get
@@ -31,6 +33,12 @@ public class TileNode
             return 2;
         }
     }
+
+    //public GameObject attRangeObj
+    //{
+    //    get => attRangeTileObj;
+    //    set => attRangeTileObj = value;
+    //}
 
     public TileNode()
     {

@@ -396,7 +396,15 @@ public class MapManager : MonoBehaviour
             }
         }
 
-        mapMgr.MakeAttRangeTileNode(attRangeObj, attRangeObjTrans);
+        mapMgr.SetTileOffset();
+        mapMgr.MakeAttRangeTileNode();
+    }
+
+    public GameObject MakeAttRangeQuad(Vector3 worldPos)
+    {
+        GameObject obj = Instantiate(attRangeObj, attRangeObjTrans);
+        obj.transform.Translate(worldPos);
+        return obj;
     }
 
     void ResetNewMinimap()

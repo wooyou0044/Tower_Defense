@@ -1714,6 +1714,7 @@ MonoBehaviour:
   prevBuildTowerTrans: {fileID: 1269845303}
   buildTowerTrans: {fileID: 925063904}
   previewTowerMat: {fileID: 2100000, guid: 67dbf8a9ca5b51145ab6643e8c1fe2f8, type: 2}
+  rangePerTile: 4
 --- !u!4 &415186253
 Transform:
   m_ObjectHideFlags: 0

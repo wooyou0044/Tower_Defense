@@ -9,6 +9,9 @@ public enum eDefTowerType
     Radar,
 }
 
+//                          원형사거리 - 직사각형사거리 - 방향성사거리
+public enum eAttAreaType { CircleType, RectType, SectorType }
+
 [CreateAssetMenu(fileName = "NewDefTowerData", menuName = "DefTowerData", order = 1)]
 public class DefTower : ScriptableObject
 {
@@ -20,7 +23,9 @@ public class DefTower : ScriptableObject
     public int att;
     public Vector2Int anchorOffset = new Vector2Int(0, 0);
     public eDefTowerType defType;
-    public Vector3[] attRangeRad;
+    public eAttAreaType attAreaType;
+    public Vector2 attRangeRad;
+    public float attSectorAngle;
     public GameObject defTowerObject;
     public Sprite defTowerImage;
 
