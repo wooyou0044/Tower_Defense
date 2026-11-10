@@ -40,6 +40,9 @@ public class BuildManager : MonoBehaviour
 
     Vector2 centerOffset;
     Vector3 centerPos;
+    Vector3 prevCenterPos;
+
+    bool isHavePrevRange;
 
     static public BuildManager Instance
     {
@@ -77,6 +80,8 @@ public class BuildManager : MonoBehaviour
         MakeInitRndTowerPack();
         InitiateDefTower();
         //prevTower = null;
+
+        isHavePrevRange = false;
     }
 
     void Update()
@@ -324,6 +329,7 @@ public class BuildManager : MonoBehaviour
             prevTower.SetActive(false);
         }
         //towerCtrl.ChangeMatCanBuild(false);
+        ClearAttRange(towerCtrl.MyTower);
         uiMgr.SetCanNotBuildIconPos(mousePos);
     }
 
@@ -453,29 +459,58 @@ public class BuildManager : MonoBehaviour
     // 타워 설치 타일의 worldPosition에서 범위를 계산해서 해당 범위에 들어가는 타일 바꾸기
     void SetTowerAttRange(TileNode applyTileNode, DefTower myTower)
     {
-        Debug.Log("tileOffset : " + tileOffset);
-        Vector3 centerPos = applyTileNode.worldPosition;
+        Vector3 newCenterPos = applyTileNode.worldPosition;
         Vector2 attRange = myTower.attRangeRad;
+        float moveDistance = isHavePrevRange ? Vector3.Distance(newCenterPos, prevCenterPos) : 0f;
         float maxRangeNum = Mathf.Max(attRange.x, attRange.y);
-        int searchNum = Mathf.CeilToInt(maxRangeNum) / tileOffset;
+        int searchNum = Mathf.CeilToInt(maxRangeNum + moveDistance) / tileOffset;
 
         for(int x = -searchNum; x <= searchNum; x++)
         {
             for(int z = -searchNum; z <= searchNum; z++)
             {
-                Vector3 targetPos = centerPos + new Vector3(x * tileOffset, 0f, z * tileOffset);
-                if (!IsRange(centerPos, targetPos, attRange, myTower))
+                Vector3 targetPos = newCenterPos + new Vector3(x * tileOffset, 0f, z * tileOffset);
+                //if (!IsRange(newCenterPos, targetPos, attRange, myTower))
+                //{
+                //    continue;
+                //}
+                //AttRangeController rangeCtrl = GetOrCreateDicAttRangeQuad(targetPos);
+                //if(rangeCtrl.GetCurState == AttRangeController.eRangeState.None)
+                //{
+                //    rangeCtrl.gameObject.SetActive(true);
+                //}
+                //rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
+                bool isNewRange = IsRange(newCenterPos, targetPos, attRange, myTower);
+                bool isPrevRange = isHavePrevRange && IsRange(prevCenterPos, targetPos, attRange, myTower);
+                if(isNewRange == false && isPrevRange == false)
                 {
                     continue;
                 }
                 AttRangeController rangeCtrl = GetOrCreateDicAttRangeQuad(targetPos);
-                rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
-                if(rangeCtrl.gameObject.activeSelf == false)
+                if (rangeCtrl == null)
                 {
-                    rangeCtrl.gameObject.SetActive(true);
+                    continue;
                 }
+                if (isPrevRange == true && isNewRange == false)
+                {
+                    rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.None);
+                }
+                else if (isNewRange == true)
+                {
+                    if(rangeCtrl.GetCurState == AttRangeController.eRangeState.None)
+                    {
+                        rangeCtrl.gameObject.SetActive(true);
+                    }
+                    // 범위에 따라 현재 상태 + 1;
+                    rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
+                }
+
+                //rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
             }
         }
+
+        prevCenterPos = applyTileNode.worldPosition;
+        isHavePrevRange = true;
     }
 
     AttRangeController GetOrCreateDicAttRangeQuad(Vector3 applyWorldPos)
@@ -489,6 +524,37 @@ public class BuildManager : MonoBehaviour
         AttRangeController rangeQuadCtrl = MapManager.Instance.MakeAttRangeQuad(applyWorldPos).GetComponent<AttRangeController>();
         dicWorldPosRangeQuad.Add(applyWorldPos, rangeQuadCtrl);
         return rangeQuadCtrl;
+    }
+
+    void ClearAttRange(DefTower myTower)
+    {
+        if(isHavePrevRange == false)
+        {
+            return;
+        }
+        Vector3 attRange = myTower.attRangeRad;
+        float maxRangeNum = Mathf.Max(attRange.x, attRange.y);
+        int searchNum = Mathf.CeilToInt(maxRangeNum) / tileOffset;
+
+        for (int x = -searchNum; x <= searchNum; x++)
+        {
+            for(int z = -searchNum; z<= searchNum; z++)
+            {
+                Vector3 targetPos = prevCenterPos + new Vector3(x * tileOffset, 0f, z * tileOffset);
+                if(!IsRange(prevCenterPos, targetPos, attRange, myTower))
+                {
+                    continue;
+                }
+                if(dicWorldPosRangeQuad.TryGetValue(targetPos, out var controller))
+                {
+                    if(controller.GetCurState != AttRangeController.eRangeState.None)
+                    {
+                        controller.ChangeRangeState(AttRangeController.eRangeState.None);
+                    }
+                }
+            }
+        }
+        isHavePrevRange = false;
     }
 
     public void TempPrint()

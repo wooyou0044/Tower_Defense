@@ -15,6 +15,11 @@ public class AttRangeController : MonoBehaviour
     Renderer rend;
     Material mat;
 
+    public eRangeState GetCurState
+    {
+        get => curState;
+    }
+
     private void Awake()
     {
         mat = new Material(Resources.Load<Material>("AttRangeMat"));
@@ -34,7 +39,7 @@ public class AttRangeController : MonoBehaviour
         
     }
 
-    public void ChangeAttRangeMat(bool isUpgrade, int upgradeLvl)
+    void ChangeAttRangeMat(bool isUpgrade, int upgradeLvl)
     {
         float boolUp = (isUpgrade == true) ? 1f : 0f;
         mat.SetFloat("_IsUpgrade", boolUp);
@@ -48,5 +53,23 @@ public class AttRangeController : MonoBehaviour
             return;
         }
         curState = state;
+        // eRangeState에 따라 설정이 달라야 함
+        switch(state)
+        {
+            case eRangeState.None:
+                // Material이랑 숫자 변경
+                ChangeAttRangeMat(false, 0);
+                gameObject.SetActive(false);
+                return;
+            case eRangeState.BaseRange:
+                ChangeAttRangeMat(false, 0);
+                return;
+            case eRangeState.Upgrade1:
+                ChangeAttRangeMat(true, 1);
+                return;
+            case eRangeState.Upgrade2:
+                ChangeAttRangeMat(true, 2);
+                return;
+        }
     }
 }
