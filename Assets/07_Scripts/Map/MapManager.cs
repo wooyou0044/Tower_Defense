@@ -403,7 +403,8 @@ public class MapManager : MonoBehaviour
     public GameObject MakeAttRangeQuad(Vector3 worldPos)
     {
         GameObject obj = Instantiate(attRangeObj, attRangeObjTrans);
-        obj.transform.Translate(worldPos);
+        //obj.transform.Translate(worldPos);
+        obj.transform.position = worldPos;
         return obj;
     }
 
