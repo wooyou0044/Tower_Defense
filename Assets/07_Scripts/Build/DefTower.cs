@@ -7,6 +7,8 @@ public enum eDefTowerType
 {
     Canon,
     Radar,
+    Flame,
+    MachineGun,
 }
 
 //                          원형사거리 - 직사각형사거리 - 방향성사거리
@@ -25,7 +27,7 @@ public class DefTower : ScriptableObject
     public eDefTowerType defType;
     public eAttAreaType attAreaType;
     public Vector2 attRangeRad;
-    public float attSectorAngle;
+    public Vector2 upgradeRange;
     public GameObject defTowerObject;
     public Sprite defTowerImage;
 

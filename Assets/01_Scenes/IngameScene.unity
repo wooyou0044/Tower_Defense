@@ -1709,12 +1709,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ecfa0c352fe174f4db3a07f2768fcafa, type: 2}
   - {fileID: 11400000, guid: 49f9c4c879dac8c42a0bad3941b9086a, type: 2}
   - {fileID: 11400000, guid: 8f58ffc128d604f45ba09ad506406e03, type: 2}
+  - {fileID: 11400000, guid: 7ac205ace54e0c04298222a831ff30cb, type: 2}
+  - {fileID: 11400000, guid: 98f7e07ca192f5341ab80199cace9c70, type: 2}
   uiMgr: {fileID: 184898864}
   initRndTowerNum: 5
   prevBuildTowerTrans: {fileID: 1269845303}
   buildTowerTrans: {fileID: 925063904}
   previewTowerMat: {fileID: 2100000, guid: 67dbf8a9ca5b51145ab6643e8c1fe2f8, type: 2}
-  rangePerTile: 4
 --- !u!4 &415186253
 Transform:
   m_ObjectHideFlags: 0

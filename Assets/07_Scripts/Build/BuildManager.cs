@@ -11,7 +11,6 @@ public class BuildManager : MonoBehaviour
     [SerializeField] Transform prevBuildTowerTrans;
     [SerializeField] Transform buildTowerTrans;
     [SerializeField] Material previewTowerMat;
-    [SerializeField] float initUpgradeNum;
 
     static BuildManager _instance;
 
@@ -289,7 +288,7 @@ public class BuildManager : MonoBehaviour
                     {
                         prevTower.SetActive(true);
                     }
-                    SetTowerAttRange(hitTileNode, towerCtrl.MyTower);
+                    SetTowerAttRange(hitTileNode, towerCtrl);
                     //Debug.Log("건설 가능");
                     //towerCtrl.ChangeMatCanBuild(true);
                     uiMgr.SetCanNotBuildIconActive(false);
@@ -438,14 +437,14 @@ public class BuildManager : MonoBehaviour
         dicWorldPosRangeQuad.Add(key, attRangeCtrl);
     }
 
-    bool IsRange(Vector3 centerPos, Vector3 targetPos, Vector2 attRange, DefTower myTower)
+    bool IsRange(Vector3 centerPos, Vector3 targetPos, Vector2 attRange, DefTower tower)
     {
         Vector3 delta = targetPos - centerPos;
 
         float rangeX = attRange.x;
         float rangeZ = attRange.y;
 
-        switch(myTower.attAreaType)
+        switch(tower.attAreaType)
         {
             case eAttAreaType.CircleType:
                 float radius = rangeX;
@@ -455,13 +454,17 @@ public class BuildManager : MonoBehaviour
     }
 
     // 타워 설치 타일의 worldPosition에서 범위를 계산해서 해당 범위에 들어가는 타일 바꾸기
-    void SetTowerAttRange(TileNode applyTileNode, DefTower myTower)
+    void SetTowerAttRange(TileNode applyTileNode, TowerController controller)
     {
         ClearAttRange();
         Vector3 newCenterPos = applyTileNode.worldPosition;
-        Vector2 attRange = myTower.attRangeRad;
-        float maxRangeNum = Mathf.Max(attRange.x, attRange.y);
-        int searchNum = Mathf.CeilToInt((maxRangeNum) / tileOffset);
+        //Vector2 attRange = controller.GetCurrentRange(0);
+        //float maxRangeNum = Mathf.Max(attRange.x, attRange.y);
+        Vector2 baseRange = controller.GetCurrentRange(0);
+        Vector2 upgrade1Range = controller.GetCurrentRange(1);
+        Vector2 upgrade2Range = controller.GetCurrentRange(2);
+        float maxRangeNum = Mathf.Max(upgrade2Range.x, upgrade2Range.y);
+        int searchNum = Mathf.CeilToInt(maxRangeNum / tileOffset);
         Vector2Int centerIndex = applyTileNode.globalIndex;
 
         for(int x = -searchNum; x <= searchNum; x++)
@@ -491,7 +494,20 @@ public class BuildManager : MonoBehaviour
                 //    rangeCtrl.gameObject.SetActive(true);
                 //}
                 //rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
-                if(!IsRange(newCenterPos, targetPos, attRange, myTower))
+                AttRangeController.eRangeState rangeState;
+                if(IsRange(newCenterPos, targetPos, baseRange, controller.MyTower))
+                {
+                    rangeState = AttRangeController.eRangeState.BaseRange;
+                }
+                else if(IsRange(newCenterPos, targetPos, upgrade1Range, controller.MyTower))
+                {
+                    rangeState = AttRangeController.eRangeState.Upgrade1;
+                }
+                else if(IsRange(newCenterPos, targetPos, upgrade2Range, controller.MyTower))
+                {
+                    rangeState = AttRangeController.eRangeState.Upgrade2;
+                }
+                else
                 {
                     continue;
                 }
@@ -505,7 +521,7 @@ public class BuildManager : MonoBehaviour
                     rangeCtrl.gameObject.SetActive(true);
                 }
                 // 범위에 따라 현재 상태 + 1;
-                rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
+                rangeCtrl.ChangeRangeState(rangeState);
 
                 //rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
             }

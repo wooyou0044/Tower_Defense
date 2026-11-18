@@ -159,6 +159,11 @@ public class TowerController : MonoBehaviour
         }
     }
 
+    public Vector2 GetCurrentRange(int upgradeLvl)
+    {
+        return myTower.attRangeRad + (myTower.upgradeRange * upgradeLvl);
+    }
+
     public void SetTowerInfo(DefTower tower)
     {
         myTower = tower;
