@@ -61,7 +61,20 @@ public class TowerController : MonoBehaviour
         newTowerMat.SetFloat("_isBuildMinimap", 1f);
         newTowerMat.SetFloat("_Transparency", 0.8f);
         newTowerMat.SetFloat("_isRoadConnect", 1f);
-        towerRend.material = newTowerMat;
+        // 자식들 중에 아들 자식들이 MeshRenderer이 있으면 변경
+        foreach(Transform child in GetComponentsInChildren<Transform>())
+        {
+            if(child == transform)
+            {
+                continue;
+            }
+            MeshRenderer mesh = child.GetComponent<MeshRenderer>();
+            if(mesh == true)
+            {
+                mesh.material = newTowerMat;
+            }
+        }
+        //towerRend.material = newTowerMat;
     }
 
     public void ChangeMatCanBuild(bool isCanBuild)
