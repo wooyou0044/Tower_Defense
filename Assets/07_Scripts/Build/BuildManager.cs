@@ -437,18 +437,36 @@ public class BuildManager : MonoBehaviour
         dicWorldPosRangeQuad.Add(key, attRangeCtrl);
     }
 
-    bool IsRange(Vector3 centerPos, Vector3 targetPos, Vector2 attRange, DefTower tower)
+    bool IsRange(Vector3 centerPos, Vector3 targetPos, Vector2 attRange, TowerController controller)
     {
         Vector3 delta = targetPos - centerPos;
+        delta.y = 0;
 
         float rangeX = attRange.x;
         float rangeZ = attRange.y;
 
-        switch(tower.attAreaType)
+        Vector3 forward = Vector3.ProjectOnPlane(controller.transform.forward, Vector3.up).normalized;
+        Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
+
+        float forwardDistance = Vector3.Dot(delta, forward);
+        float rightDistance = Vector3.Dot(delta, right);
+
+        if (forward.sqrMagnitude < 0.001f)
+        {
+            return false;
+        }
+
+        switch (controller.MyTower.attAreaType)
         {
             case eAttAreaType.CircleType:
                 float radius = rangeX;
                 return delta.x * delta.x + delta.z * delta.z <= radius * radius;
+            case eAttAreaType.RectType:
+                float halfWidth = attRange.x;
+                float forwardLength = attRange.y;
+                
+                return Mathf.Abs(rightDistance) <= halfWidth && forwardDistance >= 0f && forwardDistance <= forwardLength;
+
         }
         return false;
     }
@@ -466,7 +484,6 @@ public class BuildManager : MonoBehaviour
         float maxRangeNum = Mathf.Max(upgrade2Range.x, upgrade2Range.y);
         int searchNum = Mathf.CeilToInt(maxRangeNum / tileOffset);
         Vector2Int centerIndex = applyTileNode.globalIndex;
-
         for(int x = -searchNum; x <= searchNum; x++)
         {
             for(int z = -searchNum; z <= searchNum; z++)
@@ -482,28 +499,16 @@ public class BuildManager : MonoBehaviour
                 {
                     targetPos = newCenterPos + new Vector3(x * tileOffset, 0f, z * tileOffset);
                 }
-
-                //Vector3 targetPos = newCenterPos + new Vector3(x * tileOffset, 0f, z * tileOffset);
-                //if (!IsRange(newCenterPos, targetPos, attRange, myTower))
-                //{
-                //    continue;
-                //}
-                //AttRangeController rangeCtrl = GetOrCreateDicAttRangeQuad(targetPos);
-                //if(rangeCtrl.GetCurState == AttRangeController.eRangeState.None)
-                //{
-                //    rangeCtrl.gameObject.SetActive(true);
-                //}
-                //rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
                 AttRangeController.eRangeState rangeState;
-                if(IsRange(newCenterPos, targetPos, baseRange, controller.MyTower))
+                if(IsRange(newCenterPos, targetPos, baseRange, controller))
                 {
                     rangeState = AttRangeController.eRangeState.BaseRange;
                 }
-                else if(IsRange(newCenterPos, targetPos, upgrade1Range, controller.MyTower))
+                else if(IsRange(newCenterPos, targetPos, upgrade1Range, controller))
                 {
                     rangeState = AttRangeController.eRangeState.Upgrade1;
                 }
-                else if(IsRange(newCenterPos, targetPos, upgrade2Range, controller.MyTower))
+                else if(IsRange(newCenterPos, targetPos, upgrade2Range, controller))
                 {
                     rangeState = AttRangeController.eRangeState.Upgrade2;
                 }

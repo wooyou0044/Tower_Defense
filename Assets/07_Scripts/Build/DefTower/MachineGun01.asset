@@ -16,11 +16,12 @@ MonoBehaviour:
   towerName: "\uAE30\uAD00\uCD1D01"
   buildCoin: 225
   towerCount: 0
-  att: 0
+  attDamage: 8
+  attDelay: 0.2
   anchorOffset: {x: 1, y: 0}
   defType: 3
   attAreaType: 1
-  attRangeRad: {x: 3, y: 12}
-  upgradeRange: {x: 1.5, y: 3}
+  attRangeRad: {x: 6, y: 12}
+  upgradeRange: {x: 3, y: 5}
   defTowerObject: {fileID: 1625185752757950276, guid: 03629cb80ffe9c94f92bcef823c69985, type: 3}
   defTowerImage: {fileID: 21300000, guid: be982fe7dbc1553418694e01183406ef, type: 3}

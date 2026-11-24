@@ -177,6 +177,11 @@ public class TowerController : MonoBehaviour
         return myTower.attRangeRad + (myTower.upgradeRange * upgradeLvl);
     }
 
+    public float GetDPS()
+    {
+        return myTower.attDamage / myTower.attDelay;
+    }
+
     public void SetTowerInfo(DefTower tower)
     {
         myTower = tower;

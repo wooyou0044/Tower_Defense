@@ -22,7 +22,8 @@ public class DefTower : ScriptableObject
     public string towerName;
     public int buildCoin;
     public int towerCount;
-    public int att;
+    public float attDamage;
+    public float attDelay;
     public Vector2Int anchorOffset = new Vector2Int(0, 0);
     public eDefTowerType defType;
     public eAttAreaType attAreaType;
