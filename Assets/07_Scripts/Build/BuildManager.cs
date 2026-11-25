@@ -451,6 +451,8 @@ public class BuildManager : MonoBehaviour
         float forwardDistance = Vector3.Dot(delta, forward);
         float rightDistance = Vector3.Dot(delta, right);
 
+        float radius;
+
         if (forward.sqrMagnitude < 0.001f)
         {
             return false;
@@ -459,14 +461,24 @@ public class BuildManager : MonoBehaviour
         switch (controller.MyTower.attAreaType)
         {
             case eAttAreaType.CircleType:
-                float radius = rangeX;
+                radius = rangeX;
                 return delta.x * delta.x + delta.z * delta.z <= radius * radius;
             case eAttAreaType.RectType:
-                float halfWidth = attRange.x;
-                float forwardLength = attRange.y;
-                
-                return Mathf.Abs(rightDistance) <= halfWidth && forwardDistance >= 0f && forwardDistance <= forwardLength;
+                return Mathf.Abs(rightDistance) <= rangeX && forwardDistance >= 0f && forwardDistance <= rangeZ;
+            case eAttAreaType.SectorType:
+                radius = rangeX;
+                if(delta.sqrMagnitude > radius * radius)
+                {
+                    return false;
+                }
+                if(delta.sqrMagnitude < 0.001f)
+                {
+                    return true;
+                }
+                float halfAngle = rangeZ * 0.5f;
+                float cosHalfAngle = Mathf.Cos(halfAngle * Mathf.Deg2Rad);
 
+                return Vector3.Dot(delta.normalized, forward) >= cosHalfAngle;
         }
         return false;
     }
@@ -489,7 +501,10 @@ public class BuildManager : MonoBehaviour
             for(int z = -searchNum; z <= searchNum; z++)
             {
                 Vector2Int targetIndex = centerIndex + new Vector2Int(x, z);
-
+                if(IsBuildTowerQuad(targetIndex, applyTileNode.globalIndex))
+                {
+                    continue;
+                }
                 Vector3 targetPos;
                 if(dicGlobalTileNode.TryGetValue(targetIndex, out TileNode targetTile))
                 {
@@ -531,6 +546,18 @@ public class BuildManager : MonoBehaviour
                 //rangeCtrl.ChangeRangeState(AttRangeController.eRangeState.BaseRange);
             }
         }
+    }
+
+    bool IsBuildTowerQuad(Vector2Int targetIdx, Vector2Int startGlobalIdx)
+    {
+        foreach(Vector2Int offset in tileOffsetList)
+        {
+            if(targetIdx == startGlobalIdx + offset)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     AttRangeController GetOrCreateDicAttRangeQuad(Vector3 applyWorldPos)
