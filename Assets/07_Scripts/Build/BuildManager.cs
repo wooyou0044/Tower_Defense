@@ -415,6 +415,7 @@ public class BuildManager : MonoBehaviour
             GameManager.Instance.BuildTower(buildDefTower.buildCoin);
             buildBtnCtrl.ChangeTowerNum(true);
             DeActivateTower();
+            ClearAttRange();
         }
     }
 

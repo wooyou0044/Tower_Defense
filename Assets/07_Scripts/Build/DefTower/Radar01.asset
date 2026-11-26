@@ -16,7 +16,7 @@ MonoBehaviour:
   towerName: "\uB808\uC774\uB354"
   buildCoin: 50
   towerCount: 0
-  attDamage: 5
+  attDamage: 4
   attDelay: 1.5
   anchorOffset: {x: 0, y: 0}
   defType: 1
